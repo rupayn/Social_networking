@@ -1,35 +1,27 @@
-FROM node:20-alpine AS base
-
-# Required for some native dependencies on Alpine
-RUN apk update && apk add --no-cache libc6-compat
-
+# ---------- Build image ----------
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# ---
-FROM base AS prepare
-RUN npm install -g turbo
+# Copy frontend package files
+COPY apps/frontend/package*.json ./apps/frontend/
+
+# Install dependencies for frontend
+RUN npm install --prefix ./apps/frontend
+
+# Copy all sources (for shared UI packages etc.)
 COPY . .
 
-# Prune monorepo for frontend app
-RUN turbo prune frontend --docker
+# Build the frontend (adjust script name if needed)
+RUN npm run build --prefix ./apps/frontend
 
-# ---
-FROM base AS runner
+# ---------- Nginx runtime image ----------
+FROM nginx:alpine AS runtime
 
-WORKDIR /app
+# Copy built assets from builder
+COPY --from=builder /app/apps/frontend/dist /usr/share/nginx/html
 
-# Install dependencies for the pruned workspace
-COPY --from=prepare /app/out/json/ .
-RUN npm install
+# Expose HTTP port
+EXPOSE 80
 
-# Copy full frontend source
-COPY --from=prepare /app/out/full/ .
-
-# Switch to frontend app
-WORKDIR /app/apps/frontend
-
-# Optional, but documents the default React port (CRA = 3000)
-EXPOSE 5173
-
-# Start the React app using its own script and port
-CMD ["npm", "start"]
+# Nginx will serve the built static files by default
+CMD ["nginx", "-g", "daemon off;"]

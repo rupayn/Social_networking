@@ -1,38 +1,60 @@
-# ---------- Builder ----------
-FROM node:20-alpine AS builder
-
-WORKDIR /repo
-
-# Copy workspace files
-COPY package.json package-lock.json ./
-COPY turbo.json ./turbo.json
-COPY apps ./apps
-COPY packages ./packages
-
-# Install all deps for the monorepo
-RUN npm ci
-
-# Build only backend (npm workspaces)
-# Assumes "backend" is the workspace name in root package.json
-RUN npx turbo run build --filter=backend...
-
-# ---------- Runtime ----------
-FROM node:20-alpine AS runner
-
+# -------- Base image & common config --------
+FROM node:22-alpine AS base
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Copy backend dist and package.json
-COPY --from=builder /repo/apps/backend/dist ./dist
-COPY --from=builder /repo/apps/backend/package.json ./
+# -------- Install dependencies (with devDeps) --------
+FROM base AS deps
 
-# Copy production node_modules from builder
-# (this avoids re-installing in the runner)
-COPY --from=builder /repo/node_modules ./node_modules
+# Copy root and backend package files first (better layer caching)
+COPY package.json package-lock.json turbo.json ./
+COPY apps/backend/package.json ./apps/backend/package.json
 
-# If backend_things is not built separately:
-# Either it's only used at build time (then omit this),
-# or you want the package present at runtime:
-COPY --from=builder /repo/packages/backend_things ./packages/backend_things
+# Install ALL dependencies (including dev) for building
+RUN npm i
 
-CMD ["node", "dist/server.js"]
+# -------- Build backend --------
+FROM base AS builder
+WORKDIR /app
+
+# Reuse node_modules from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy the rest of the monorepo
+COPY . .
+
+RUN npm i
+
+# Build only the backend workspace
+# Make sure "backend" matches the name in apps/backend/package.json
+RUN npm run build --workspace backend
+
+# -------- Production runtime image --------
+FROM node:22-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+# Create a non-root user for security
+RUN addgroup -S nodegroup && adduser -S nodeuser -G nodegroup
+
+# Copy only the files needed to install prod deps
+COPY package.json package-lock.json turbo.json ./
+COPY apps/backend/package.json ./apps/backend/package.json
+
+# Install ONLY production dependencies
+RUN npm ci --omit=dev
+
+# Copy built backend code from builder stage
+COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
+
+# If your backend uses any other runtime assets (e.g. .env.example, prisma schema, etc.),
+# copy them here as needed.
+# COPY --from=builder /app/apps/backend/prisma ./apps/backend/prisma
+
+EXPOSE 3000
+
+USER nodeuser
+
+# Start the backend in production mode
+# Ensure apps/backend/package.json has a "start" script
+CMD ["node", "run", "start"]
