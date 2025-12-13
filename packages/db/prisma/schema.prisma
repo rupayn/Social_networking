@@ -12,3 +12,44 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  username  String  @unique
+  name      String?
+  password  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role      Role     @default(CANDIDATE)
+  phone     String?
+  avatar    String?
+  avatar_id String?
+  resume    String?
+  resume_id String?
+  Session   Session[] // remove accessToken/refreshToken from User; they belong to Session  
+} 
+
+model Session {
+  id                        Int       @id @default(autoincrement())
+  sessionId                 String    @unique
+  user                      User      @relation(fields: [userId], references: [id])
+  userId                    Int
+  accessToken               String?   // optional if you store token server-side
+  refreshToken              String?   // refresh token (if you use refresh flow)
+  refreshTokenExpiresAt     DateTime?
+  createdAt                 DateTime  @default(now())
+  lastSeenAt                DateTime? @updatedAt
+  revokedAt                 DateTime?
+  active                    Boolean   @default(true)
+  ua                        String?
+  ip                        String?
+
+  @@index([userId])
+}
+
+
+enum Role {
+  RECRUITER
+  CANDIDATE
+}
