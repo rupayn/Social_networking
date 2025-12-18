@@ -1,0 +1,50 @@
+# Dependencies
+node_modules
+.pnpm-store
+.pnp.*
+.yarn
+.yarn-cache
+
+# Build outputs
+dist
+build
+.out
+.next
+.turbo
+coverage
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# OS / Editor
+.DS_Store
+.idea
+.vscode
+
+# Turborepo
+.turbo
+
+# Package managers
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Generated files
+*.min.js
+*.min.css
+*.map
+
+# Prisma / DB
+prisma/migrations
+
+# Public assets (optional)
+public/**/*.svg
+public/**/*.png
+public/**/*.jpg
+*.json
+eslint.config.js

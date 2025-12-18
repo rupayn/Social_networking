@@ -14,4 +14,4 @@ RUN npm i
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+CMD ["npx", "turbo", "run", "dev", "--filter=backend"]

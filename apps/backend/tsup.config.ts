@@ -6,7 +6,6 @@ export default defineConfig((options: Options) => ({
   format: ["esm"],
 
   target: "ES2022",
- 
 
   ...options,
 }));

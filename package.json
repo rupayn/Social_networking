@@ -4,13 +4,17 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "dev:backend": "turbo run dev --filter=backend",
+    "dev:frontend": "turbo run dev --filter=frontend",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format:check": "prettier --check .",
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
     "@types/pg": "^8.15.6",
+    "dotenv-cli": "^11.0.0",
     "prettier": "^3.6.2",
     "prisma": "^7.1.0",
     "turbo": "^2.6.3",
