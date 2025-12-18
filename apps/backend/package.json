@@ -15,7 +15,6 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@repo/backend_things": "^0.0.0",
     "@repo/logger": "^0.0.0",
     "@types/cors": "^2.8.19",
     "@types/morgan": "^1.9.10",
