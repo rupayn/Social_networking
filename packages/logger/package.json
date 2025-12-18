@@ -1,0 +1,14 @@
+{
+    "name": "@repo/logger",
+    "version": "0.0.0",
+    "license": "MIT",
+    "type": "module",
+    "private": true,
+    "exports": {
+        "./config": "./src/index.ts"
+    },
+    "dependencies": {
+        "morgan": "^1.10.1",
+        "winston": "^3.19.0"
+    }
+}

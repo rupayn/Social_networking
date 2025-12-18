@@ -1,1 +1,1 @@
-export let a =20
+export let a = 20;

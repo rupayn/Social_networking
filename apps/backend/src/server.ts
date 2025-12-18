@@ -1,12 +1,30 @@
-import express from "express"
-import {a} from "@repo/backend_things/config"
-const app= express();
+import "dotenv/config";
+import express, { type Express } from "express";
+import cors from "cors";
 
-app.get("/",(req:express.Request,res:express.Response)=>{
-    console.log("first ",a);
-    res.send("Hii ");
-})
+import api from "./routes/user.route.js";
+import { myLog, configureLogger } from "@repo/logger/config";
 
-app.listen(3000, () => {
-    console.log("Server is running on port 3000");
-})
+async function bootstrap(): Promise<Express> {
+  configureLogger();
+  const app = express();
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  app.use(
+    cors({
+      origin: "http://localhost:5473",
+      credentials: true,
+      methods: "GET, POST, PUT, DELETE, OPTIONS",
+    })
+  );
+
+  if (process.env.NODE_ENV == "dev") app.use(myLog);
+  app.get("/", (res: express.Response) => {
+    res.send("Hii");
+  });
+  app.use("/api", api);
+
+  return app;
+}
+
+export { bootstrap };

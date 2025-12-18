@@ -4,7 +4,14 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "inputs": ["$TURBO_DEFAULT$", ".env"],
+      "env": [
+        "DATABASE_URL",
+        "O_AUTH_CLIENT_ID",
+        "O_AUTH_CLIENT_SECRET",
+        "PORT",
+        "NODE_ENV"
+      ],
       "outputs": [
         "build/**",
         ".vercel/**",
