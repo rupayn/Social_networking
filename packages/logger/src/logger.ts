@@ -22,7 +22,7 @@ export const logger = createLogger({
 });
 
 export function configureLogger() {
-  const isDev = process.env.NODE_ENV === "dev";
+  const isDev = process.env.NODE_ENV === "development";
 
   logger.transports.forEach((t) => {
     if (t instanceof transports.Console) {

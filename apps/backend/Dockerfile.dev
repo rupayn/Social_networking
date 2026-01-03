@@ -13,5 +13,6 @@ COPY . .
 RUN npm i 
 
 EXPOSE 3000
+EXPOSE 51212
 
 CMD ["npx", "turbo", "run", "dev", "--filter=backend"]
