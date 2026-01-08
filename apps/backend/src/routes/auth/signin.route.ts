@@ -7,7 +7,30 @@ import { ForgotPasswordZodSchema, signInZodSchema } from "../../utils/zod.schema
 
 const authRouter = Router();
 
-authRouter.route("/signin").post(validate(signInZodSchema),signinController);
+/*
+ ********************************************************************************************************************************************************************************************************
+ *  Signup route
+ ****************************************************************************************************
+ ****************************************************************************************************
+*/
 authRouter.route("/signup").post(signUpController);
+
+/**
+ ****************************************************************************************************
+ ****************************************************************************************************
+ * 
+ * Signin route
+ * 
+ ********************************************************************************************************************************************************************************************************
+ */
+
+authRouter.route("/signin").post(validate(signInZodSchema),signinController); 
+
+// Signin With google route
+
+authRouter.route("/signin/google").post(signinController);
+authRouter.route("/signin/google/callback").post(signinController);
+
+
 authRouter.route("/forgot").post(validate(ForgotPasswordZodSchema),forgotPassword);
 export default authRouter;

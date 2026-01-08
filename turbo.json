@@ -10,7 +10,10 @@
         "O_AUTH_CLIENT_ID",
         "O_AUTH_CLIENT_SECRET",
         "PORT",
-        "NODE_ENV"
+        "NODE_ENV",
+        "REDIRECT_URI",
+        "JWT_ACCESS_SECRET",
+        "SALT_ROUNDS"
       ],
       "outputs": [
         "build/**",
