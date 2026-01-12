@@ -10,7 +10,9 @@ type RequestHandlerType = (
 
 const asyncHandler = function (requestHandler: RequestHandlerType) {
   return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    Promise.resolve(requestHandler(req, res, next)).catch(next);
+    Promise.resolve(requestHandler(req, res, next)).catch((err)=>{
+      return next(err)
+    });
   };
 };
 export { errorHandler, asyncHandler };

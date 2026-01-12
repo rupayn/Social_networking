@@ -15,45 +15,48 @@ datasource db {
 
 
 model User {
-  id        Int     @id @default(autoincrement())
-  email     String  @unique
-  emailVerified Boolean @default(false)
-  provider  Provider
-  username  String  @unique
-  name      String?
-  password  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  role      Role     @default(CANDIDATE)
-  phone     String?
-  avatar    String?
-  avatar_id String?
-  resume    String?
-  resume_id String?
-  Session   Session[] // remove accessToken/refreshToken from User; they belong to Session  
+  id            String      @id @default(cuid())
+  email         String      @unique
+  emailVerified Boolean     @default(false)
+  provider      Provider
+  username      String      @unique
+  name          String?
+  password      String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  role          Role        @default(CANDIDATE)
+  phone         String?
+  avatar        String?
+  avatar_id     String?
+  resume        String?
+  resume_id     String?
+  profileStatus ProfileStatus @default(active)
+  Session       Session[] // remove accessToken/refreshToken from User; they belong to Session  
 } 
 
 model Session {
-  id                        Int       @id @default(autoincrement())
-  sessionId                 String    @unique
-  userId                    Int
-  user                      User      @relation(fields: [userId], references: [id])
-  accessToken               String?   // optional if you store token server-side
-  refreshToken              String?   // refresh token (if you use refresh flow)
-  refreshTokenExpiresAt     DateTime?
-  createdAt                 DateTime  @default(now())
-  lastSeenAt                DateTime? @updatedAt
-  revokedAt                 DateTime?
-  active                    Boolean   @default(true)
-  userAgent                        String?
-  ip                        String?
-
+  id                        String      @id @default(cuid())
+  userId                    String      @unique
+  user                      User        @relation(fields: [userId], references: [id],onDelete: Cascade)
+  refreshToken              String
+  refreshTokenDateOfExpire  BigInt
+  createdAt                 DateTime    @default(now())
+  updatedAt                 DateTime?   @updatedAt
+  active                    Boolean     @default(true)
+  userAgent                 String?
+  deviceId                  String     @unique
   @@index([userId])
 }
 
 enum Provider {
   GOOGLE
   MANUAL
+}
+
+enum ProfileStatus {
+  active
+  suspended
+  deactivated
 }
 
 enum Role {

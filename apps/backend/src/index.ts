@@ -1,10 +1,11 @@
 import { logger } from "@repo/logger/config";
 import { bootstrap } from "./server.ts";
 import http from "http";
+import { ApiError } from "./utils/customError.ts";
 async function main() {
   const port = process.env.PORT;
   if (!port) {
-    throw new Error("PORT is not set");
+    throw new ApiError(500, "PORT is not set");
   }
   const app = await bootstrap();
 
@@ -14,5 +15,12 @@ async function main() {
   });
 }
 main().catch((err) => {
-  logger.error(err instanceof Error ? err.message : String(err));
+   if (err instanceof ApiError) {
+    logger.error(`Startup error: ${err.message}`);
+  } else {
+    logger.error("Unexpected startup error", err);
+  }
+
+  // 🚨 fatal startup failure → exit
+  process.exit(1);
 });

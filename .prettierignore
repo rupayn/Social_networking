@@ -48,3 +48,4 @@ public/**/*.png
 public/**/*.jpg
 *.json
 eslint.config.js
+*.js

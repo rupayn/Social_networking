@@ -3,6 +3,7 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import axios from "axios";
+import SignWithGoogle from "./components/SignWithGoogle";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -21,12 +22,15 @@ function App() {
       <div className="card">
         <button
           onClick={async () => {
-            await axios.get("http://localhost:3000/");
+            await axios.get("http://localhost:3000/", {
+              withCredentials: true,
+            });
             setCount((count) => count + 1);
           }}
         >
           count is {count}
         </button>
+        <SignWithGoogle />
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
