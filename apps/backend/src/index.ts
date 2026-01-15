@@ -1,7 +1,7 @@
 import { logger } from "@repo/logger/config";
-import { bootstrap } from "./server.ts";
+import { bootstrap } from "@/server.ts";
 import http from "http";
-import { ApiError } from "./utils/customError.ts";
+import { ApiError } from "@/utils/customError.ts";
 async function main() {
   const port = process.env.PORT;
   if (!port) {

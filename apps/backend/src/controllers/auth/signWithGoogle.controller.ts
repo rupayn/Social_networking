@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { asyncHandler } from "../../utils/handler.ts";
+import { asyncHandler } from "@/utils/handler.ts";
 import express from "express";
 import {
   generateHashToken,
@@ -7,11 +7,11 @@ import {
   GOOGLE_SCOPES,
   googleOauth2Client,
   signTokenWithJwt,
-} from "../../utils/oauth.ts";
-import { prismaClient } from "../../utils/prismaClient.ts";
+} from "@/utils/oauth.ts";
+import { prismaClient } from "@/utils/prismaClient.ts";
 import { google } from "googleapis";
-import { Provider } from "../../generated/prisma/enums.ts";
-import { userSelect } from "../../types/user.types.ts";
+import { Provider } from "@/generated/prisma/enums.ts";
+import { userSelect } from "@/types/user.types.ts";
 
 // Sign With Google
 

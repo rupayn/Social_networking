@@ -1,17 +1,19 @@
 import { Router } from "express";
-import { signinController } from "../../controllers/auth/signin.controller.ts";
-import { forgotPassword } from "../../controllers/auth/forgot.controller.ts";
+import { signinController } from "@/controllers/auth/signin.controller.ts";
+import { forgotPassword } from "@/controllers/auth/forgot.controller.ts";
 import {
   signUpWithGoogleController,
   signWithGoogleControllerCallback,
-} from "../../controllers/auth/signWithGoogle.controller.ts";
-import { validate } from "../../middleware/vaildate.ts";
+} from "@/controllers/auth/signWithGoogle.controller.ts";
+import { validate } from "@/middleware/vaildate.ts";
 import {
   ForgotPasswordZodSchema,
   signInWithGoogleZodSchema,
   signInZodSchema,
-} from "../../utils/zod.schema.ts";
-import { signUpController } from "../../controllers/auth/signup.controller.ts";
+} from "@/utils/zod.schema.ts";
+import { signUpController } from "@/controllers/auth/signup.controller.ts";
+import { signoutController } from "@/controllers/auth/signout.controller.ts";
+import { checkRefreshTokenDate } from "@/middleware/checkRefeshToken.ts";
 
 const authRouter = Router();
 
@@ -41,4 +43,47 @@ authRouter
   .get(validate(signInWithGoogleZodSchema, "query"), signWithGoogleControllerCallback);
 
 authRouter.route("/forgot").post(validate(ForgotPasswordZodSchema), forgotPassword);
+
+
+
+
+/*
+ ********************************************************************************************************************************************************************************************************
+ *  Signup route
+ ****************************************************************************************************
+ ****************************************************************************************************
+*/
+
+
+authRouter.route("/signout").post(checkRefreshTokenDate,signoutController);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export default authRouter;

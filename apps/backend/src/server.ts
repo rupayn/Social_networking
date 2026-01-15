@@ -3,8 +3,8 @@ import express, { type Express } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { myLog, configureLogger } from "@repo/logger/config";
-import route from "./routes/index.ts";
-import { checkRefreshTokenDate } from "./middleware/checkRefeshToken.ts";
+import route from "@/routes/index.ts";
+import { checkRefreshTokenDate } from "@/middleware/checkRefeshToken.ts";
 
 
 async function bootstrap(): Promise<Express> {

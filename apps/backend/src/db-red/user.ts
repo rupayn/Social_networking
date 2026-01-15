@@ -1,5 +1,5 @@
-import { SessionWithUserDTO, UserDTO, userSelect, UserWithPasswordDTO, userWithPasswordSelect, UserWithSessionsDTO, userWithSessionsSelect } from "../types/user.types.ts";
-import { prismaClient } from "../utils/prismaClient.ts";
+import { SessionWithUserDTO, UserDTO, userSelect, UserWithPasswordDTO, userWithPasswordSelect, UserWithSessionsDTO, userWithSessionsSelect } from "@/types/user.types.ts";
+import { prismaClient } from "@/utils/prismaClient.ts";
 
 export const getAllUsers = async ():Promise<UserWithSessionsDTO[]> => {
   return await prismaClient.user.findMany({

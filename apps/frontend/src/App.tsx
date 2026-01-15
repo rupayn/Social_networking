@@ -22,7 +22,7 @@ function App() {
       <div className="card">
         <button
           onClick={async () => {
-            await axios.get("http://localhost:3000/", {
+            await axios.post("http://localhost:3000/api/auth/signout",{}, {
               withCredentials: true,
             });
             setCount((count) => count + 1);

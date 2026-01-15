@@ -1,7 +1,7 @@
 import express from "express";
 
-import { asyncHandler } from "../../utils/handler.ts";
-import { prismaClient } from "../../utils/prismaClient.ts";
+import { asyncHandler } from "@/utils/handler.ts";
+import { prismaClient } from "@/utils/prismaClient.ts";
 
 export const forgotPassword = asyncHandler(async function (
   req: express.Request,

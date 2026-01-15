@@ -6,6 +6,9 @@
     "noEmit": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "lib": [
       "es2022"
     ],

@@ -16,5 +16,5 @@ export const signinController = asyncHandler(
 );
 
 export const signInWithGoogleController = asyncHandler(
-  async (_req: express.Request, res: express.Response) => {}
+  async (_req: express.Request, _res: express.Response) => {}
 );

@@ -1,13 +1,12 @@
 import express from "express";
-import { asyncHandler } from "../utils/handler.ts";
+import { asyncHandler } from "@/utils/handler.ts";
 import {
   generateHashToken,
-  generateRefreshToken,
   signTokenWithJwt,
   decodeTokenWithJwt,
-} from "../utils/oauth.ts";
-import { getUsersCheckValidRefreshToken } from "../db-red/user.ts";
-import { prismaClient } from "../utils/prismaClient.ts";
+} from "@/utils/oauth.ts";
+import { getUsersCheckValidRefreshToken } from "@/db-red/user.ts";
+import { prismaClient } from "@/utils/prismaClient.ts";
 
 export const checkRefreshTokenDate = asyncHandler(
   async (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -16,7 +15,7 @@ export const checkRefreshTokenDate = asyncHandler(
     const refreshToken = req.cookies["refresh_token"];
 
     // if no refresh token or date, unauthorized
-
+    
     if (!refreshToken) {
       return res.status(401).json({
         message: "Authentication required",
@@ -140,7 +139,8 @@ export const checkRefreshTokenDate = asyncHandler(
         maxAge: 15 * 60 * 1000,
       });
     }
-
+    res.locals.userFromMiddleware = session.user;
+    res.locals.sessionFromMiddleware = session;
     next();
   }
 );
