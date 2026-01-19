@@ -4,7 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { myLog, configureLogger } from "@repo/logger/config";
 import route from "@/routes/index.ts";
-import { checkRefreshTokenDate } from "@/middleware/checkRefeshToken.ts";
+import { checkTokens } from "@/middleware/checkRefreshToken.ts";
 
 
 async function bootstrap(): Promise<Express> {
@@ -24,7 +24,7 @@ async function bootstrap(): Promise<Express> {
   if (process.env.NODE_ENV === "development") app.use(myLog);
 
 
-  app.get("/", checkRefreshTokenDate, (req: express.Request, res: express.Response) => {
+  app.get("/", checkTokens, (req: express.Request, res: express.Response) => {
     const data = req.headers;
     const c = req.cookies;
 

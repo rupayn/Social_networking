@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { asyncHandler } from "@/utils/handler.ts";
 import express from "express";
+import crypto from "crypto";
 import {
   generateHashToken,
   
@@ -44,6 +45,12 @@ export const signWithGoogleControllerCallback = asyncHandler(
 
     if (!data.email) return res.sendStatus(400).json({ message: "Email not provided by Google" });
 
+    const username = `${String(data.email)
+          .split("@")[0]
+          ?.toLowerCase()
+          .replace(/[^a-z0-9]/g, "")
+          .slice(0, 12)}${crypto.randomBytes(3).toString("hex")}`;
+
     const user = await prismaClient.user.upsert({
       where: { email: data.email },
       update: {
@@ -55,7 +62,8 @@ export const signWithGoogleControllerCallback = asyncHandler(
         email: data.email,
         emailVerified: true,
         provider: Provider.GOOGLE,
-        username: data.email.split("@")[0] as string,
+        username,
+        bio: `Hello i am ${data.name}`,
         name: data.name,
         avatar: data.picture,
       },
@@ -72,16 +80,16 @@ export const signWithGoogleControllerCallback = asyncHandler(
 
     const accessToken = signTokenWithJwt(JSON.stringify(accessTokenContent),"15m");
     const refreshToken = `${crypto.randomUUID()}`;
-
+    const today = Date.now();
     const deviceId = crypto.randomUUID(); // unique device id to identify device
     const deviceIdToken = signTokenWithJwt(deviceId); // to verify device id later if needed it will store in client side
-    const refresh_date = signTokenWithJwt(Date.now().toString(),"7d");
+    const refresh_date = signTokenWithJwt(today.toString(),"7d");
     await prismaClient.session.upsert({
       where: { userId: user.id },
       update: {
         deviceId: deviceId,
         refreshToken: refreshToken,
-        refreshTokenDateOfExpire: BigInt(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        refreshTokenDateOfExpire: BigInt(today + 7 * 24 * 60 * 60 * 1000),
         userAgent: req.headers["user-agent"],
         active: true,
       },
@@ -90,7 +98,7 @@ export const signWithGoogleControllerCallback = asyncHandler(
         refreshToken: refreshToken,
         userAgent: req.headers["user-agent"],
         deviceId,
-        refreshTokenDateOfExpire: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        refreshTokenDateOfExpire: BigInt(today + 7 * 24 * 60 * 60 * 1000),
       },
     });
 

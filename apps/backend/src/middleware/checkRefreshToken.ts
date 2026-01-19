@@ -8,12 +8,38 @@ import {
 import { getUsersCheckValidRefreshToken } from "@/db-red/user.ts";
 import { prismaClient } from "@/utils/prismaClient.ts";
 
-export const checkRefreshTokenDate = asyncHandler(
+interface AccessTokenSubject {
+  token: string;
+  access: string;
+}
+
+
+export const checkTokens = asyncHandler(
   async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const refreshTokenDate = req.cookies["refresh_date"];
-    const acessToken = req.cookies["access_token"];
+    const accessToken = req.cookies["access_token"];
+    if(accessToken){
+      const decodedAccessToken = decodeTokenWithJwt(accessToken).sub;
+      if (!decodedAccessToken) {
+        return res.status(401).json({
+          message: "Invalid access token",
+        });
+      }
+      if(typeof decodedAccessToken === "string"){
+        const decodedAccess=JSON.parse(decodedAccessToken);
+        const userId=decodedAccess.token;
+        res.locals.userIdFromMiddleWare=userId
+        return next();
+      }
+      if(typeof decodedAccessToken === "object"){
+        const decodedAccess=decodedAccessToken as AccessTokenSubject;
+        const userId=decodedAccess.token;
+        res.locals.userIdFromMiddleWare=userId
+        return next();
+      }
+    }
     const refreshToken = req.cookies["refresh_token"];
-
+    
     // if no refresh token or date, unauthorized
     
     if (!refreshToken) {
@@ -96,7 +122,7 @@ export const checkRefreshTokenDate = asyncHandler(
         token: session.user.id.toString(),
         access: await generateHashToken(crypto.randomUUID()),
       };
-      const accessToken = signTokenWithJwt(JSON.stringify(accessTokenContent),"15m");
+      const accessTokenSigned = signTokenWithJwt(JSON.stringify(accessTokenContent),"15m");
       await prismaClient.session.update({
         where: { id: session.id },
         data: {
@@ -105,7 +131,7 @@ export const checkRefreshTokenDate = asyncHandler(
         },
       });
 
-      res.cookie("access_token", accessToken, {
+      res.cookie("access_token", accessTokenSigned, {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "development" ? false : true, // true in prod
@@ -126,13 +152,13 @@ export const checkRefreshTokenDate = asyncHandler(
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
     }
-    if (!acessToken) {
+    if (!accessToken) {
       const accessTokenContent = {
         token: session.user.id.toString(),
         access: await generateHashToken(crypto.randomUUID()),
       };
-      const accessToken = signTokenWithJwt(JSON.stringify(accessTokenContent),"15m");
-      res.cookie("access_token", accessToken, {
+      const accessTokenSigned = signTokenWithJwt(JSON.stringify(accessTokenContent), "15m");
+      res.cookie("access_token", accessTokenSigned, {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "development" ? false : true, // true in prod

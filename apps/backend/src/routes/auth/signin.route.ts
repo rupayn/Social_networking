@@ -10,10 +10,11 @@ import {
   ForgotPasswordZodSchema,
   signInWithGoogleZodSchema,
   signInZodSchema,
+  signUpZodSchema,
 } from "@/utils/zod.schema.ts";
 import { signUpController } from "@/controllers/auth/signup.controller.ts";
 import { signoutController } from "@/controllers/auth/signout.controller.ts";
-import { checkRefreshTokenDate } from "@/middleware/checkRefeshToken.ts";
+import { checkTokens } from "@/middleware/checkRefreshToken.ts";
 
 const authRouter = Router();
 
@@ -23,7 +24,7 @@ const authRouter = Router();
  ****************************************************************************************************
  ****************************************************************************************************
  */
-authRouter.route("/signup").post(signUpController);
+authRouter.route("/signup").post(validate(signUpZodSchema), signUpController);
 authRouter.route("/signin").post(validate(signInZodSchema), signinController);
 
 /**
@@ -55,7 +56,7 @@ authRouter.route("/forgot").post(validate(ForgotPasswordZodSchema), forgotPasswo
 */
 
 
-authRouter.route("/signout").post(checkRefreshTokenDate,signoutController);
+authRouter.route("/signout").post(checkTokens,signoutController);
 
 
 

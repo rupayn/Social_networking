@@ -21,9 +21,17 @@ export type TokenExpiry =
 
 const JWT_SECRET: string=process.env.JWT_ACCESS_SECRET! as string
 export function signTokenWithJwt(data: string,expiresIn?: TokenExpiry): string  {
-  if (!expiresIn) 
-  return jwt.sign({sub: data} , JWT_SECRET );
-  return jwt.sign({sub: data} , JWT_SECRET , { expiresIn: expiresIn });
+  let subject: unknown = data;
+
+  try {
+    subject = JSON.parse(data);
+  } catch {
+    // data is not JSON; keep as string
+  }
+
+  const payload = { sub: subject };
+
+  return jwt.sign(payload, JWT_SECRET, expiresIn ? { expiresIn } : undefined);
 }
 
 export function decodeTokenWithJwt(token: string): string | jwt.JwtPayload {

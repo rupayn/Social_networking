@@ -1,4 +1,4 @@
-import { SessionWithUserDTO, UserDTO, userSelect, UserWithPasswordDTO, userWithPasswordSelect, UserWithSessionsDTO, userWithSessionsSelect } from "@/types/user.types.ts";
+import { SessionWithUserDTO, UserDTO, userFindWithEmailIncludeSessionAndPasswordDTO, userSelect, userWithPasswordAndSessionsSelect, UserWithPasswordDTO, userWithPasswordSelect, UserWithSessionsDTO, userWithSessionsSelect } from "@/types/user.types.ts";
 import { prismaClient } from "@/utils/prismaClient.ts";
 
 export const getAllUsers = async ():Promise<UserWithSessionsDTO[]> => {
@@ -15,10 +15,25 @@ export const getUserById = async (id: string): Promise<UserDTO | null> => {
     select: userSelect,
   });
 };
+export const getUserByEmail = async (email: string): Promise<UserDTO | null> => {
+  return await prismaClient.user.findUnique({
+    where: { email },
+    select: userSelect,
+  });
+};
 export const getUserByIdWithPassword = async (id: string):Promise<UserWithPasswordDTO | null> => {
   return await prismaClient.user.findUnique({
     where: { id },
     select: userWithPasswordSelect,
+  });
+};
+export const getUserByEmailWithPassword = async (
+  email: string
+): Promise<userFindWithEmailIncludeSessionAndPasswordDTO | null> => {
+  return await prismaClient.user.findUnique({
+    where: { email },
+    select: userWithPasswordAndSessionsSelect,
+    
   });
 };
 
