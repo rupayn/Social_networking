@@ -1,0 +1,13 @@
+{
+  "name": "@repo/zod-schemas",
+  "version": "0.0.0",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./config": "./src/index.ts"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  }
+}

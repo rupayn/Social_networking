@@ -15,7 +15,7 @@ async function main() {
   });
 }
 main().catch((err) => {
-   if (err instanceof ApiError) {
+  if (err instanceof ApiError) {
     logger.error(`Startup error: ${err.message}`);
   } else {
     logger.error("Unexpected startup error", err);

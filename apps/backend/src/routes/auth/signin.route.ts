@@ -11,7 +11,7 @@ import {
   signInWithGoogleZodSchema,
   signInZodSchema,
   signUpZodSchema,
-} from "@/utils/zod.schema.ts";
+} from "@repo/zod-schemas/config";
 import { signUpController } from "@/controllers/auth/signup.controller.ts";
 import { signoutController } from "@/controllers/auth/signout.controller.ts";
 import { checkTokens } from "@/middleware/checkRefreshToken.ts";
@@ -45,46 +45,13 @@ authRouter
 
 authRouter.route("/forgot").post(validate(ForgotPasswordZodSchema), forgotPassword);
 
-
-
-
 /*
  ********************************************************************************************************************************************************************************************************
  *  Signup route
  ****************************************************************************************************
  ****************************************************************************************************
-*/
+ */
 
-
-authRouter.route("/signout").post(checkTokens,signoutController);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+authRouter.route("/signout").post(checkTokens, signoutController);
 
 export default authRouter;

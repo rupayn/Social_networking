@@ -6,7 +6,6 @@ import { myLog, configureLogger } from "@repo/logger/config";
 import route from "@/routes/index.ts";
 import { checkTokens } from "@/middleware/checkRefreshToken.ts";
 
-
 async function bootstrap(): Promise<Express> {
   configureLogger();
   const app = express();
@@ -22,7 +21,6 @@ async function bootstrap(): Promise<Express> {
   app.use(cookieParser());
 
   if (process.env.NODE_ENV === "development") app.use(myLog);
-
 
   app.get("/", checkTokens, (req: express.Request, res: express.Response) => {
     const data = req.headers;

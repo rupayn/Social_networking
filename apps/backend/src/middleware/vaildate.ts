@@ -1,3 +1,4 @@
+import { sendJsonResponse } from "@/utils/handler.ts";
 import { Request, Response, NextFunction } from "express";
 import { ZodError, ZodType } from "zod";
 
@@ -12,17 +13,17 @@ export const validate =
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        return res.status(400).json({
+        return sendJsonResponse(res, 400, {
           success: false,
           errors: error.issues.map((issue) => ({
             path: issue.path.join("."),
             message: issue.message,
           })),
         });
-        return res.status(400).json({
-          success: false,
-          errors: error,
-        });
       }
+      return sendJsonResponse(res, 400, {
+        success: false,
+        errors: error,
+      });
     }
   };

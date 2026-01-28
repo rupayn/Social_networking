@@ -6,5 +6,7 @@ import { updateUserZodSchema } from "@/utils/zod.schema.ts";
 import { Router } from "express";
 const userRouter = Router();
 
-userRouter.route("/get-user-details").post(checkTokens,getUserDetailsController);
-userRouter.route("/update-user-details").post(validate(updateUserZodSchema),checkTokens,updateUserDetailsController);
+userRouter.route("/get-user-details").post(checkTokens, getUserDetailsController);
+userRouter
+  .route("/update-user-details")
+  .post(validate(updateUserZodSchema), checkTokens, updateUserDetailsController);

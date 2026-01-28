@@ -1,6 +1,6 @@
 import { getUserByEmail } from "@/db-red/user.ts";
 import { Provider } from "@/generated/prisma/enums.ts";
-import { asyncHandler } from "@/utils/handler.ts";
+import { asyncHandler, sendJsonResponse } from "@/utils/handler.ts";
 import { generateHashToken, signTokenWithJwt } from "@/utils/oauth.ts";
 import { prismaClient } from "@/utils/prismaClient.ts";
 
@@ -8,10 +8,10 @@ import crypto from "crypto";
 import express from "express";
 export const signUpController = asyncHandler(
   async (req: express.Request, res: express.Response) => {
-    const { name,email, password, phone, city, state, pinCode, country,bio } = req.body;
+    const { name, email, password, phone, city, state, pinCode, country, bio } = req.body;
     const userExists = await getUserByEmail(email);
-    if(userExists) {
-      return res.status(400).json({ message: "User already exists" });
+    if (userExists) {
+      return sendJsonResponse(res, 400, { success: false, message: "User already exists" });
     }
     const passwordHash = await generateHashToken(password);
     const username = `${String(email)
@@ -19,23 +19,22 @@ export const signUpController = asyncHandler(
       ?.toLowerCase()
       .replace(/[^a-z0-9]/g, "")
       .slice(0, 12)}${crypto.randomBytes(3).toString("hex")}`;
-    const user= await prismaClient.user.create({
-      data:{
+    const user = await prismaClient.user.create({
+      data: {
         name,
         email,
         password: passwordHash,
         phone,
         city,
-        emailVerified:false,
-        bio:bio??`Hello i am ${name}`,
+        emailVerified: false,
+        bio: bio ?? `Hello i am ${name}`,
         state,
         pinCode,
         country,
-        provider:Provider.MANUAL,
-        username
-      }
-    })
-
+        provider: Provider.MANUAL,
+        username,
+      },
+    });
 
     const today = Date.now();
     const refreshToken = `${crypto.randomUUID()}`;
@@ -56,7 +55,6 @@ export const signUpController = asyncHandler(
         active: true,
         userAgent: req.headers["user-agent"],
       },
-
     });
     res.cookie("access_token", accessTokenSigned, {
       httpOnly: true,
@@ -81,10 +79,13 @@ export const signUpController = asyncHandler(
       secure: process.env.NODE_ENV === "development" ? false : true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    const{password:_,...userWithoutPassword}=user
-    if("Session" in userWithoutPassword)
-      delete userWithoutPassword.Session
+    const { password: _, ...userWithoutPassword } = user;
+    if ("Session" in userWithoutPassword) delete userWithoutPassword.Session;
 
-    res.status(201).json({ message: "User Signup successfully",user:userWithoutPassword });
+    sendJsonResponse(res, 200, {
+      success: true,
+      message: "User Signup successfully",
+      user: userWithoutPassword,
+    });
   }
 );

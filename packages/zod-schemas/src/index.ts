@@ -116,36 +116,12 @@ export const signInZodSchema = z
     email: z
       .string()
       .trim()
-      .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, "Invalid email address")
-      .min(3, "Identifier must be at least 3 characters"),
+      .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, {
+        message: "Invalid credentials",
+      })
+      .min(3, { message: "Invalid credentials" }),
 
-    password: z
-      .string()
-      .trim()
-      .superRefine((val, ctx) => {
-        if (val.length < 8) {
-          ctx.addIssue("Password must be at least 8 characters");
-        }
-
-        if (val.length > 32) {
-          ctx.addIssue("Password must be at most 32 characters");
-        }
-        if (!/[!@#$%^&*\-=+_:.?]/.test(val)) {
-          ctx.addIssue("Password must contain at least one special character [!@#$%^&*-=+_:.?]");
-        }
-
-        if (!/[0-9]/.test(val)) {
-          ctx.addIssue("Password must contain at least one number");
-        }
-
-        if (!/[A-Z]/.test(val)) {
-          ctx.addIssue("Password must contain at least one uppercase letter");
-        }
-
-        if (!/[a-z]/.test(val)) {
-          ctx.addIssue("Password must contain at least one lowercase letter");
-        }
-      }),
+    password: z.string().trim().min(2, { message: "Invalid credentials" }),
   })
   .strict();
 

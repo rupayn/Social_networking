@@ -1,4 +1,4 @@
-import { asyncHandler } from "../../utils/handler.ts";
+import { asyncHandler, sendJsonResponse } from "../../utils/handler.ts";
 import express from "express";
 
 import bcrypt from "bcrypt";
@@ -12,26 +12,28 @@ export const signinController = asyncHandler(
     const { email, password } = req.body;
     const user = await getUserByEmailWithPassword(email);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return sendJsonResponse(res, 404, { success: false, message: "User not found" });
     }
-  
+
     if (user.provider !== Provider.MANUAL)
-      return res.status(400).json({ message: `Please sign in using ${user.provider} you did not registered email and password` });
-    const checkPassword = await bcrypt.compare(password,`${user.password}`);
-    if(!checkPassword) {
-      return  res.status(401).json({ message: "Invalid credentials" });
+      return res.status(400).json({
+        message: `Please sign in using ${user.provider} you did not registered email and password`,
+      });
+    const checkPassword = await bcrypt.compare(password, `${user.password}`);
+    if (!checkPassword) {
+      return sendJsonResponse(res, 401, { success: false, message: "Invalid credentials" });
     }
     const today = Date.now();
     const refreshToken = `${crypto.randomUUID()}`;
-    const newRefreshDate = signTokenWithJwt(BigInt(today).toString(),"7d");
+    const newRefreshDate = signTokenWithJwt(BigInt(today).toString(), "7d");
     const accessTokenContent = {
-            token: user.id.toString(),
-            access: await generateHashToken(crypto.randomUUID()),
-          };
+      token: user.id.toString(),
+      access: await generateHashToken(crypto.randomUUID()),
+    };
     const deviceId = crypto.randomUUID();
     const deviceIdToken = signTokenWithJwt(deviceId);
     const accessTokenSigned = signTokenWithJwt(JSON.stringify(accessTokenContent), "15m");
-    
+
     await prismaClient.session.upsert({
       where: { userId: user.id },
       update: {
@@ -73,8 +75,11 @@ export const signinController = asyncHandler(
       secure: process.env.NODE_ENV === "development" ? false : true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    const { password: _, Session:_ses, ...restUser } = user;
-    return res.status(200).json({ message: "Sign-in successful",user:restUser });
+    const { password: _, Session: _ses, ...restUser } = user;
+    return sendJsonResponse(res, 200, {
+      success: true,
+      message: "Sign-in successful",
+      user: restUser,
+    });
   }
 );
-

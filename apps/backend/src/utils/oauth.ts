@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { google } from "googleapis";
 import crypto from "crypto";
-import  jwt  from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 /**
@@ -11,16 +11,10 @@ import bcrypt from "bcrypt";
  *
  */
 
-export type TokenExpiry =
-  | "5m"
-  | "15m"
-  | "30m"
-  | "1h"
-  | "7d";
+export type TokenExpiry = "5m" | "15m" | "30m" | "1h" | "7d";
 
-
-const JWT_SECRET: string=process.env.JWT_ACCESS_SECRET! as string
-export function signTokenWithJwt(data: string,expiresIn?: TokenExpiry): string  {
+const JWT_SECRET: string = process.env.JWT_ACCESS_SECRET! as string;
+export function signTokenWithJwt(data: string, expiresIn?: TokenExpiry): string {
   let subject: unknown = data;
 
   try {
@@ -35,8 +29,8 @@ export function signTokenWithJwt(data: string,expiresIn?: TokenExpiry): string  
 }
 
 export function decodeTokenWithJwt(token: string): string | jwt.JwtPayload {
-  return jwt.verify(token, process.env.JWT_ACCESS_SECRET!) ;
-} 
+  return jwt.verify(token, process.env.JWT_ACCESS_SECRET!);
+}
 
 export function generateRefreshToken(): string {
   return crypto.randomBytes(64).toString("hex");

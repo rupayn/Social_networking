@@ -1,6 +1,6 @@
 import express from "express";
 
-import { asyncHandler } from "@/utils/handler.ts";
+import { asyncHandler, sendJsonResponse } from "@/utils/handler.ts";
 import { prismaClient } from "@/utils/prismaClient.ts";
 
 export const forgotPassword = asyncHandler(async function (
@@ -11,11 +11,14 @@ export const forgotPassword = asyncHandler(async function (
   try {
     const user = await prismaClient.user.findUnique({ where: { email } });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return sendJsonResponse(res, 404, { success: false, message: "User not found" });
     }
 
-    return res.status(200).json({ message: "Password reset link sent to your email" });
+    return sendJsonResponse(res, 200, {
+      success: true,
+      message: "Password reset link sent to your email",
+    });
   } catch {
-    return res.status(500).json({ message: "Internal server error" });
+    return sendJsonResponse(res, 500, { success: false, message: "Internal server error" });
   }
 });

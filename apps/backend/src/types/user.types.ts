@@ -1,8 +1,8 @@
 import { Prisma } from "@/generated/prisma/client.ts";
 
-/** 
+/**
  * Base Session
- * */ 
+ * */
 
 export const sessionSelect = {
   id: true,
@@ -39,7 +39,7 @@ export const userSelect = {
   country: true,
   linkedin: true,
   github: true,
-  pinCode : true,
+  pinCode: true,
   state: true,
   twitter: true,
   website: true,
@@ -63,7 +63,7 @@ export const userWithSessionsSelect = {
 
 /**
  * User selection including sessions and password
-*/
+ */
 
 export const userWithPasswordAndSessionsSelect = {
   ...userWithSessionsSelect,
@@ -72,7 +72,6 @@ export const userWithPasswordAndSessionsSelect = {
     select: sessionSelect,
   },
 } satisfies Prisma.UserSelect;
-
 
 export type UserDTO = Prisma.UserGetPayload<{
   select: typeof userSelect;
@@ -96,5 +95,3 @@ export type SessionWithUserDTO = Prisma.SessionGetPayload<{
     };
   };
 }> | null;
-
-

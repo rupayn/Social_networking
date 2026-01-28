@@ -1,5 +1,5 @@
 {
-  "name": "social-netwoking",
+  "name": "porilekh",
   "private": true,
   "scripts": {
     "build": "turbo run build",

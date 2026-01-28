@@ -1,7 +1,10 @@
-import { describe, it, expect,vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import express from "express";
 import request from "supertest";
-import { signUpWithGoogleController, signWithGoogleControllerCallback } from "@/controllers/auth/signWithGoogle.controller.ts";
+import {
+  signUpWithGoogleController,
+  signWithGoogleControllerCallback,
+} from "@/controllers/auth/signWithGoogle.controller.ts";
 
 const generateAuthUrl = vi.fn().mockReturnValue("https://google-auth-url");
 const getToken = vi.fn().mockResolvedValue({
@@ -33,7 +36,6 @@ vi.mock("../__mocks__/googleapis.ts", () => ({
 }));
 vi.mock("@/utils/oauth.ts");
 vi.mock("../../utils/prismaClient.ts");
-
 
 const app = express();
 app.get("/auth/google", signUpWithGoogleController);

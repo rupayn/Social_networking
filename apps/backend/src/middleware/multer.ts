@@ -1,10 +1,10 @@
 import multer from "multer";
 
-export const multerUploadSingle=multer({
+export const multerUploadSingle = multer({
   limits: {
     fileSize: 1024 * 1024 * 5, //5MB
   },
-})
+});
 
 export const singleAvatar = multerUploadSingle.single("avatar");
 export const multerUpload = multer({

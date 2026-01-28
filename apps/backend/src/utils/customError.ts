@@ -2,14 +2,13 @@ export class ApiError extends Error {
   public readonly statusCode: number;
   public readonly errors: unknown[];
   public readonly isOperational = true;
-
+  success: boolean = false;
   constructor(
     statusCode: number,
     message: string = "Something went wrong",
     errors: unknown[] = []
   ) {
     super(message);
-
     this.statusCode = statusCode;
     this.errors = errors;
 

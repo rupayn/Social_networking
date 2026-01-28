@@ -10,9 +10,18 @@ type RequestHandlerType = (
 
 const asyncHandler = function (requestHandler: RequestHandlerType) {
   return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    Promise.resolve(requestHandler(req, res, next)).catch((err)=>{
-      return next(err)
+    Promise.resolve(requestHandler(req, res, next)).catch((err) => {
+      return next(err);
     });
   };
 };
-export { errorHandler, asyncHandler };
+
+const sendJsonResponse = function <T extends object>(
+  res: express.Response,
+  statusCode: number,
+  data: T
+) {
+  return res.status(statusCode).json({ success: false, ...data });
+};
+
+export { errorHandler, asyncHandler, sendJsonResponse };
