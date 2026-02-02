@@ -14,13 +14,13 @@ type Props = {
   dataFields: SignupDataFields;
   nextStep: () => void;
 
-  updateDataFields: (key: keyof SignupDataFields, values: string) => void;
+  updateDataFields: (element:Partial<SignupDataFields>)=>void;
 };
 
 function SignupFirstComp({
   dataFields,
-  nextStep: _nextStep,
-  updateDataFields: _updateDataFields,
+  nextStep,
+  updateDataFields,
 }: Props) {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useSelector((state: RootState) => state?.theme.value);
@@ -47,7 +47,10 @@ function SignupFirstComp({
         draggable: true,
         transition: Zoom,
       });
+      return
     }
+    updateDataFields({ email: emailData, phone: phoneData });
+    nextStep();
   };
 
   return (
@@ -79,6 +82,7 @@ function SignupFirstComp({
             type="text"
             name="email"
             id="email"
+            value={emailData}
             onChange={(e) => {
               emailHandler(e);
             }}
@@ -95,14 +99,15 @@ function SignupFirstComp({
             type="tel"
             name="phone"
             id="phone"
+            value={phoneData}
             placeholder="1234567890"
             className="w-full bg-gray-700 text-gray-100 border border-gray-600 rounded-full px-5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
             onChange={phoneHandler}
           />
         </div>
-
+        {/* Navigation */}
         <button
-          className="mt-2 w-full bg-blue-600 hover:bg-blue-700 transition text-white rounded-full py-2.5 font-medium"
+          className="mt-2 w-full bg-blue-600 hover:bg-blue-800 cursor-pointer hover:font-bold transition text-white rounded-full py-2.5 font-medium"
           onClick={handelNext}
         >
           Next {"->"}

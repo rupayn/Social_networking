@@ -12,6 +12,5 @@ export const signoutController = asyncHandler(async function (
       secure: process.env.NODE_ENV === "development" ? false : true,
     });
   });
-
   sendJsonResponse(res, 200, { success: true, message: "Sign-out successful" });
 });

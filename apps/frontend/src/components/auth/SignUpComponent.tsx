@@ -1,8 +1,11 @@
 import SignupFirstComp from "./signup/SignupFirstComp";
 import useSignupForm from "../../hooks/useSignupForm";
+import SignupSecondComp from "./signup/SignupSecondComp";
+import SignupThirdComp from "./signup/SignupThirdComp";
+import SignupFourthComp from "./signup/SignupFourthComp";
 
 function SignUpComponent() {
-  const { step, dataFields, nextStep, prevStep: _prevStep, updateDataFields } = useSignupForm();
+  const { step, dataFields, nextStep, prevStep, updateDataFields,backToFirst } = useSignupForm();
 
   const renderStep = () => {
     switch (step) {
@@ -15,9 +18,13 @@ function SignUpComponent() {
           />
         );
       case 1:
-        return <div>Second step</div>;
+        return <SignupSecondComp dataFields={dataFields} nextStep={nextStep} prevStep={prevStep} updateDataFields={updateDataFields}/>;
+      case 2:
+        return <SignupThirdComp dataFields={dataFields} nextStep={nextStep} prevStep={prevStep} updateDataFields={updateDataFields} />
+      case 3:
+        return <SignupFourthComp dataFields={dataFields} prevStep={prevStep} updateDataFields={updateDataFields}/>
       default:
-        return "null";
+        backToFirst();
     }
   };
   return <>{renderStep()}</>;

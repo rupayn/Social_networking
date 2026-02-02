@@ -14,6 +14,7 @@ export type SignupDataFields = {
   resume: string;
   resume_id: string;
   pinCode: string;
+  dist:string;
   city: string;
   state: string;
   country: string;
@@ -38,19 +39,22 @@ function useSignupForm() {
     city: "",
     state: "",
     country: "",
+    dist:"",
   });
-  const updateDataFields = (key: keyof SignupDataFields, values: string) => {
+  const updateDataFields = (data: Partial<SignupDataFields>) => {
     setDataFields((prev) => ({
       ...prev,
-      [key]: values,
+      ...data,
     }));
   };
+  const backToFirst=()=>setStep(0);
   return {
     step,
     nextStep: () => setStep((prev) => prev + 1),
     prevStep: () => setStep((prev) => prev - 1),
     dataFields,
     updateDataFields,
+    backToFirst
   };
 }
 

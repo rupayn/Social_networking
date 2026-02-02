@@ -1,0 +1,189 @@
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../../redux/store";
+import { setTheme } from "../../../redux/features/theme.slice";
+import { FaLightbulb, FaMoon } from "react-icons/fa6";
+import { useState , useEffect } from "react";
+import type { SignupDataFields } from "../../../hooks/useSignupForm";
+import {
+  useGetAddressFromPinCodeQuery,
+  type PostOffice,
+} from "../../../redux/features/api/postOfficeApi.sclice";
+
+type Props = {
+  dataFields: SignupDataFields;
+  nextStep: () => void;
+  prevStep: () => void;
+  updateDataFields: (element: Partial<SignupDataFields>) => void;
+};
+
+function SignupThirdComp({ dataFields, nextStep, prevStep, updateDataFields }: Props) {
+  const dispatch = useDispatch<AppDispatch>();
+  const theme = useSelector((state: RootState) => state.theme.value);
+
+  const [pin, setPin] = useState("");
+  const [manualEntry, setManualEntry] = useState(false);
+
+  // RTK QUERY
+  const {
+    data: offices = [],
+    isFetching,
+    isError,
+  } = useGetAddressFromPinCodeQuery(pin, {
+    skip: pin.length !== 6,
+  });
+
+  // AUTO FILL FIRST RESULT
+  useEffect(() => {
+    if (!offices.length || manualEntry) return;
+
+    const po = offices[0];
+    updateDataFields({
+      city: po.Name || po.Block,
+      dist: po.District,
+      state: po.State,
+      country: "India",
+    });
+  }, [offices, manualEntry]);
+  const handlePinChange = (value: string) => {
+    updateDataFields({ pinCode: value });
+    setPin(value);
+    setManualEntry(false);
+  };
+
+  const handleSelectPostOffice = (name: string) => {
+    const po = offices.find((p) => p.Name === name);
+    if (!po) return;
+
+    updateDataFields({
+      city: po.Name || po.Block,
+      dist: po.District,
+      state: po.State,
+      country: "India",
+    });
+  };
+
+  return (
+    <div className="relative w-full max-w-md mx-auto px-6 py-8 flex flex-col gap-5">
+      {/* THEME TOGGLE */}
+      <button
+        onClick={() => dispatch(setTheme())}
+        className="sm:hidden absolute top-4 right-4 p-2 rounded-full bg-gray-700 dark:bg-gray-200 text-white dark:text-black"
+      >
+        {theme === "dark" ? <FaMoon /> : <FaLightbulb />}
+      </button>
+
+      {/* PIN CODE */}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium text-black dark:text-white">Pin Code *</label>
+        <input
+          type="text"
+          maxLength={6}
+          value={dataFields.pinCode}
+          onChange={(e) => handlePinChange(e.target.value)}
+          className="w-full bg-gray-700 text-gray-100 border rounded-full px-5 py-2.5"
+        />
+
+        {isFetching && <span className="text-xs font-extrabold dark:font-normal text-blue-900 dark:text-blue-400">Loading address…</span>}
+
+        {isError && <span className="text-xs text-red-400">PIN not found. Enter manually.</span>}
+      </div>
+
+      {/* CITY */}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium text-black dark:text-white">City / Village</label>
+        <input
+          type="text"
+          value={dataFields.city}
+          onChange={(e) => {
+            updateDataFields({ city: e.target.value });
+            setManualEntry(true);
+          }}
+          className="w-full bg-gray-700 text-gray-100 border rounded-full px-5 py-2.5"
+        />
+      </div>
+
+      {/* SELECT ASSIST */}
+      {offices.length > 1 && !manualEntry && (
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-gray-500 dark:text-gray-400">Select from results</label>
+          <select
+            onChange={(e) => handleSelectPostOffice(e.target.value)}
+            className="w-full bg-gray-700 text-gray-100 border rounded-full px-5 py-2.5"
+          >
+            {offices.map((po: PostOffice) => (
+              <option key={po.Name} value={po.Name}>
+                {po.Name}, {po.District}
+              </option>
+            ))}
+          </select>
+
+          <button
+            type="button"
+            onClick={() => setManualEntry(true)}
+            className="text-xs underline text-blue-500 self-start"
+          >
+            Enter manually
+          </button>
+        </div>
+      )}
+
+      {/* DISTRICT */}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium text-black dark:text-white">District</label>
+        <input
+          type="text"
+          value={dataFields.dist}
+          onChange={(e) => {
+            updateDataFields({ dist: e.target.value });
+            setManualEntry(true);
+          }}
+          className="w-full bg-gray-700 text-gray-100 border rounded-full px-5 py-2.5"
+        />
+      </div>
+
+      {/* STATE */}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium text-black dark:text-white">State</label>
+        <input
+          type="text"
+          value={dataFields.state}
+          onChange={(e) => {
+            updateDataFields({ state: e.target.value });
+            setManualEntry(true);
+          }}
+          className="w-full bg-gray-700 text-gray-100 border rounded-full px-5 py-2.5"
+        />
+      </div>
+
+      {/* COUNTRY */}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium text-black dark:text-white">Country</label>
+        <input
+          type="text"
+          value={dataFields.country}
+          disabled
+          className="w-full bg-gray-700 text-gray-100 border rounded-full px-5 py-2.5 opacity-70"
+        />
+      </div>
+
+      {/* NAVIGATION */}
+      <div className="flex justify-between gap-4 pt-4">
+        <button
+          onClick={prevStep}
+          className="w-full bg-emerald-600 rounded-full py-2 hover:bg-emerald-800 text-white"
+        >
+          {"<- "}Prev
+        </button>
+
+        <button
+          onClick={nextStep}
+          className="w-full bg-blue-600 rounded-full py-2 hover:bg-blue-800 text-white"
+        >
+          Next{" ->"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default SignupThirdComp;

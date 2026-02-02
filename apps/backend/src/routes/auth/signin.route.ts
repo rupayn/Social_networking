@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { signinController } from "@/controllers/auth/signin.controller.ts";
-import { forgotPassword } from "@/controllers/auth/forgot.controller.ts";
+import { forgotPasswordSendLink, resetPasswordController } from "@/controllers/auth/forgot.controller.ts";
 import {
   signUpWithGoogleController,
   signWithGoogleControllerCallback,
@@ -15,6 +15,7 @@ import {
 import { signUpController } from "@/controllers/auth/signup.controller.ts";
 import { signoutController } from "@/controllers/auth/signout.controller.ts";
 import { checkTokens } from "@/middleware/checkRefreshToken.ts";
+import { verifyEmailController } from "@/controllers/auth/verify.email.controller.ts";
 
 const authRouter = Router();
 
@@ -43,7 +44,7 @@ authRouter
   .route("/sign/google/callback")
   .get(validate(signInWithGoogleZodSchema, "query"), signWithGoogleControllerCallback);
 
-authRouter.route("/forgot").post(validate(ForgotPasswordZodSchema), forgotPassword);
+authRouter.route("/forgot").post(validate(ForgotPasswordZodSchema), forgotPasswordSendLink);
 
 /*
  ********************************************************************************************************************************************************************************************************
@@ -55,3 +56,9 @@ authRouter.route("/forgot").post(validate(ForgotPasswordZodSchema), forgotPasswo
 authRouter.route("/signout").post(checkTokens, signoutController);
 
 export default authRouter;
+
+
+
+//  email verification route
+authRouter.route("/verify-email").post(verifyEmailController);
+authRouter.route("/reset-password").post(resetPasswordController);

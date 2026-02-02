@@ -65,7 +65,7 @@ function SigninLayout() {
         </div>
       </div>
 
-      <div className=" relative z-10 w-full  max-w-md min-h-72 bg-rose-200 dark:bg-gray-800 rounded-2xl mt-16 sm:mt-10 shadow-xl flex  items-center justify-center">
+      <div className=" relative z-10 w-full  max-w-md min-h-72 bg-rose-200 dark:bg-slate-900 rounded-2xl mt-16 sm:mt-10 shadow-xl flex  items-center justify-center">
         <ToastContainer />
         {/* <Outlet /> */}
         <Outlet></Outlet>

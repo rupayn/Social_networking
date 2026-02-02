@@ -1,50 +1,61 @@
-import React from "react";
+import  { forwardRef, useRef } from "react";
 import { IoCloudUploadOutline } from "react-icons/io5";
+
 type UploadFileProps = {
   multiple?: boolean;
   className?: string;
+  accept?: string;
+  id: string;
   onFileSelect: (file: File[]) => void;
 };
-function UploadFile({ multiple = false, onFileSelect, className }: UploadFileProps) {
-  /**
-   * Handles the upload of a file.
-   * This function is called whenever the user selects a new file to upload.
-   */
 
-  const inputRef = React.useRef<HTMLInputElement | null>(null);
-  const handelUpload = (e: FileList | null) => {
-    if (!e) {
-      return;
-    }
-    if (e.length > 5) {
-      alert("You can select a maximum of 5 files.");
-      if (inputRef?.current) {
-        inputRef.current.value = "";
+const UploadFile = forwardRef<HTMLInputElement, UploadFileProps>(
+  ({ id, multiple = false, onFileSelect, className, accept }, ref) => {
+    const inputRef = useRef<HTMLInputElement | null>(null);
+
+    const handleUpload = (files: FileList | null) => {
+      if (!files) return;
+
+      if (files.length > 5) {
+        alert("You can select a maximum of 5 files.");
+        if (inputRef.current) inputRef.current.value = "";
+        return;
       }
-      return;
-    }
 
-    onFileSelect(Array.from(e));
-  };
-  return (
-    <div>
-      <input
-        type="file"
-        ref={inputRef}
-        className="hidden bg-pink-500"
-        multiple={multiple}
-        max={5}
-        id="file"
-        onChange={(e) => handelUpload(e.target.files)}
-      />
-      <label
-        htmlFor="file"
-        className={`flex items-center text-5xl justify-center cursor-pointer  bg-amber-50 ${className || ""} `}
-      >
-        <IoCloudUploadOutline />
-      </label>
-    </div>
-  );
-}
+      onFileSelect(Array.from(files));
+    };
+
+    return (
+      <div className="w-full">
+        <input
+          type="file"
+          ref={(node) => {
+            inputRef.current = node;
+            if (typeof ref === "function") ref(node);
+            else if (ref) ref.current = node;
+          }}
+          className="hidden"
+          multiple={multiple}
+          id={id}
+          accept={accept}
+          onChange={(e) => handleUpload(e.target.files)}
+        />
+
+        <label
+          htmlFor={id}
+          className={`
+            flex flex-col items-center justify-center cursor-pointer
+            text-3xl sm:text-4xl
+            text-gray-600 dark:text-gray-300
+            hover:scale-105 transition
+            ${className || ""}
+          `}
+        >
+          <IoCloudUploadOutline />
+        </label>
+      </div>
+    );
+  }
+);
 
 export default UploadFile;

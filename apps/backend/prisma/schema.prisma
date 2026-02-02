@@ -33,6 +33,7 @@ model User {
   profileStatus ProfileStatus @default(active)
   Session       Session? // remove accessToken/refreshToken from User; they belong to Session
   city          String?
+  dist          String?
   state         String?
   country       String?
   pinCode       String?

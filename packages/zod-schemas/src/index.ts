@@ -58,7 +58,11 @@ export const signUpZodSchema = z
       .trim()
       .min(2, "State must be at least 2 characters")
       .max(100, "State name is too long"),
-
+    dist: z
+      .string()
+      .trim()
+      .min(2, "District must be at least 2 characters")
+      .max(100, "District name is too long"),
     country: z
       .string()
       .trim()
@@ -153,6 +157,7 @@ export const ForgotPasswordZodSchema = z
       .trim()
       .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, "Invalid email address")
       .min(3, "Identifier must be at least 3 characters"),
+    username: z.string().trim().min(3, "Username must be at least 3 characters"),
   })
   .strict();
 

@@ -35,6 +35,7 @@ export const userSelect = {
   profileStatus: true,
   role: true,
   bio: true,
+  dist: true,
   city: true,
   country: true,
   linkedin: true,

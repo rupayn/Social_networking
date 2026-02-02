@@ -14,11 +14,12 @@ export const signUpController = asyncHandler(
       return sendJsonResponse(res, 400, { success: false, message: "User already exists" });
     }
     const passwordHash = await generateHashToken(password);
-    const username = `${String(email)
-      .split("@")[0]
-      ?.toLowerCase()
-      .replace(/[^a-z0-9]/g, "")
-      .slice(0, 12)}${crypto.randomBytes(3).toString("hex")}`;
+    const username = `${crypto.randomUUID()}`
+    // `${String(email)
+    //   .split("@")[0]
+    //   ?.toLowerCase()
+    //   .replace(/[^a-z0-9]/g, "")
+    //   .slice(0, 12)}${crypto.randomBytes(3).toString("hex")}`;
     const user = await prismaClient.user.create({
       data: {
         name,

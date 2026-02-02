@@ -22,6 +22,23 @@ services:
       retries: 5
       start_period: 10s
 
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - db_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     container_name: backend
     build:
@@ -30,10 +47,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: unless-stopped
     env_file:
       - ./.env
-    # make sure your backend listens on 0.0.0.0:3000 inside the container
     ports:
       - "3000:3000"
       - "51212:51212"
@@ -46,6 +64,9 @@ services:
       - /app/node_modules
     environment:
       CHOKIDAR_USEPOLLING: "true"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
   frontend:
     container_name: frontend
     build:
@@ -56,7 +77,6 @@ services:
       - ./.env
     depends_on:
       - backend
-    # adjust if your frontend uses another port
     ports:
       - "5173:5173"
     networks:
@@ -83,3 +103,4 @@ networks:
 
 volumes:
   postgres_data:
+  redis_data:
