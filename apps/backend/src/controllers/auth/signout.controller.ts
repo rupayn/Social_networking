@@ -1,5 +1,6 @@
 import express from "express";
 import { asyncHandler, sendJsonResponse } from "@/utils/handler.ts";
+import { NODE_ENV } from "@/utils/envs.ts";
 export const signoutController = asyncHandler(async function (
   req: express.Request,
   res: express.Response
@@ -9,7 +10,7 @@ export const signoutController = asyncHandler(async function (
     res.clearCookie(cookieName, {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "development" ? false : true,
+      secure: NODE_ENV === "development" ? false : true,
     });
   });
   sendJsonResponse(res, 200, { success: true, message: "Sign-out successful" });

@@ -214,3 +214,31 @@ export const updateUserZodSchema = z.object({
   twitter: urlField.optional(),
   website: urlField.optional(),
 });
+
+
+//  Forgot Password:
+export const forgotPasswordSendLinkZodSchema = z
+  .object({
+    email: z
+      .string()
+      .trim()
+      .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, "Invalid email address")
+      .min(3, "Identifier must be at least 3 characters"),
+  })
+  .strict();
+
+
+export const validateResetPasswordTokenZodSchema = z
+  .object({
+    token: z
+      .string()
+      .trim()
+      .min(10, "Token must be at least 10 characters"),
+
+    code: z
+      .string()
+      .trim()
+      .min(4, "Code must be at least 4 characters")
+      
+  })
+  .strict();

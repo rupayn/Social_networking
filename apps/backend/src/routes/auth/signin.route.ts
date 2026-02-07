@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { signinController } from "@/controllers/auth/signin.controller.ts";
-import { forgotPasswordSendLink, resetPasswordController } from "@/controllers/auth/forgot.controller.ts";
+import { forgotPasswordSendLink, resetPasswordController, validateResetPasswordToken } from "@/controllers/auth/forgot.controller.ts";
 import {
   signUpWithGoogleController,
   signWithGoogleControllerCallback,
 } from "@/controllers/auth/signWithGoogle.controller.ts";
 import { validate } from "@/middleware/vaildate.ts";
 import {
+  forgotPasswordSendLinkZodSchema,
   ForgotPasswordZodSchema,
   signInWithGoogleZodSchema,
   signInZodSchema,
@@ -61,4 +62,6 @@ export default authRouter;
 
 //  email verification route
 authRouter.route("/verify-email").post(verifyEmailController);
+authRouter.route("/forgot-password-send-link").post(validate(forgotPasswordSendLinkZodSchema),forgotPasswordSendLink)
+authRouter.route("/validate-reset-password-token").get(validateResetPasswordToken);
 authRouter.route("/reset-password").post(resetPasswordController);

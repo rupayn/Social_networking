@@ -16,7 +16,9 @@
         "SALT_ROUNDS",
         "CLOUDINARY_CLOUD_NAME",
         "BREVO_API_KEY",
-        "REDIS_URL"
+        "REDIS_URL",
+        "FRONTEND_URL",
+        "BACKEND_URL"
       ],
       "outputs": [
         "build/**",

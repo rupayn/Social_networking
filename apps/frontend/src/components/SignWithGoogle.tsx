@@ -6,11 +6,12 @@ function SignWithGoogle({ className }: { className?: string }) {
   const [isHovered, setIsHovered] = React.useState(false);
   const handelLogin = () => {
     window.location.href = `${API_BASE}/auth/sign/google`;
+    
   };
   return (
     <div
       onClick={handelLogin}
-      className={` flex text-2xl md:text-xl bg-blue-100 font-bold ${isHovered ? "border border-inherit " : ""}  justify-center border border-b-amber-950  ${className || ""}`}
+      className={` flex text-2xl md:text-xl bg-blue-100 font-bold ${isHovered ? "border border-inherit " : ""} cursor-pointer  justify-center border border-b-amber-950  ${className || ""}`}
       onMouseOver={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

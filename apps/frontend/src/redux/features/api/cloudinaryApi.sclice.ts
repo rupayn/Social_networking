@@ -9,7 +9,7 @@ export const cloudinaryApi= createApi({
     baseUrl:`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/`,
   }),
   endpoints:(builder)=>({
-    uploadToCloudinary:builder.mutation<any,FormData>({
+    uploadToCloudinary:builder.mutation<unknown,FormData>({
       query:(formData)=>({
         url:`auto/upload`,
         body:formData,
@@ -18,3 +18,4 @@ export const cloudinaryApi= createApi({
     })
   })
 })
+

@@ -12,6 +12,7 @@ import { prismaClient } from "@/utils/prismaClient.ts";
 import { google } from "googleapis";
 import { Provider } from "@/generated/prisma/enums.ts";
 import { userSelect } from "@/types/user.types.ts";
+import { NODE_ENV } from "@/utils/envs.ts";
 
 // Sign With Google
 
@@ -104,24 +105,24 @@ export const signWithGoogleControllerCallback = asyncHandler(
     res.cookie("access_token", accessToken, {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "development" ? false : true, // true in prod
+      secure: NODE_ENV === "development" ? false : true, // true in prod
       maxAge: 15 * 60 * 1000,
     });
     res.cookie("refresh_date", refresh_date, {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "development" ? false : true,
+      secure: NODE_ENV === "development" ? false : true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.cookie("device_id", deviceIdToken, {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "development" ? false : true,
+      secure: NODE_ENV === "development" ? false : true,
     });
     res.cookie("refresh_token", signTokenWithJwt(refreshToken, "7d"), {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "development" ? false : true,
+      secure: NODE_ENV === "development" ? false : true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 

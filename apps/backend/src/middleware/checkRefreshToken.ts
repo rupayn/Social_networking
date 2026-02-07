@@ -3,6 +3,7 @@ import { asyncHandler, sendJsonResponse } from "@/utils/handler.ts";
 import { generateHashToken, signTokenWithJwt, decodeTokenWithJwt } from "@/utils/oauth.ts";
 import { getUsersCheckValidRefreshToken } from "@/db-red/user.ts";
 import { prismaClient } from "@/utils/prismaClient.ts";
+import { NODE_ENV } from "@/utils/envs.ts";
 
 interface AccessTokenSubject {
   token: string;
@@ -121,21 +122,21 @@ export const checkTokens = asyncHandler(
       res.cookie("access_token", accessTokenSigned, {
         httpOnly: true,
         sameSite: "lax",
-        secure: process.env.NODE_ENV === "development" ? false : true, // true in prod
+        secure: NODE_ENV === "development" ? false : true, // true in prod
         maxAge: 15 * 60 * 1000,
       });
 
       res.cookie("refresh_token", signTokenWithJwt(refreshToken, "7d"), {
         httpOnly: true,
         sameSite: "lax",
-        secure: process.env.NODE_ENV === "development" ? false : true,
+        secure: NODE_ENV === "development" ? false : true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       res.cookie("refresh_date", newRefreshDate, {
         httpOnly: true,
         sameSite: "lax",
-        secure: process.env.NODE_ENV === "development" ? false : true,
+        secure: NODE_ENV === "development" ? false : true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
     }
@@ -148,7 +149,7 @@ export const checkTokens = asyncHandler(
       res.cookie("access_token", accessTokenSigned, {
         httpOnly: true,
         sameSite: "lax",
-        secure: process.env.NODE_ENV === "development" ? false : true, // true in prod
+        secure: NODE_ENV === "development" ? false : true, // true in prod
         maxAge: 15 * 60 * 1000,
       });
     }
