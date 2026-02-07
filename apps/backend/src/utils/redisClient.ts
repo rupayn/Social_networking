@@ -20,4 +20,17 @@ if (NODE_ENV === "development") {
 if (!redisClient.isOpen) {
   await redisClient.connect();
 }
-export { redisClient };
+
+const getCache=async <T>(key:string):Promise<T|null> =>{
+  const data=await redisClient.get(key);
+  if(!data){
+    return null;
+  }
+  return JSON.parse(data) as T;
+}
+
+const setCache=async (key:string,data:unknown,ttl=300):Promise<void>=>{
+  await redisClient.set(key,JSON.stringify(data),{EX:ttl});
+}
+
+export { redisClient,setCache,getCache };
