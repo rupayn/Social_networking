@@ -1,4 +1,4 @@
-import { getUserById } from "@/db-red/user.ts";
+import { getUserById } from "@/services/user.ts";
 import { asyncHandler, sendJsonResponse } from "@/utils/handler.ts";
 
 import express from "express";

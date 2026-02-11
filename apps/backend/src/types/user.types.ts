@@ -73,6 +73,13 @@ export const userWithPasswordAndSessionsSelect = {
     select: sessionSelect,
   },
 } satisfies Prisma.UserSelect;
+export const userWithCompleteSessionsWithoutPasswordSelect = {
+  ...userWithSessionsSelect,
+  
+  Session: {
+    select: sessionSelect,
+  },
+} satisfies Prisma.UserSelect;
 
 export type UserDTO = Prisma.UserGetPayload<{
   select: typeof userSelect;

@@ -15,6 +15,6 @@ export const sendMail =(subject:string, data:string, clientEmail:string,clientNa
     <p>Regards,<br/>Porilekh Team</p>
   `,
     textContent: data,
-    sender: { email: "no-reply@rupayannandi.top", name: "Team Proilekh" },
+    sender: { email: "no-reply@rupayannandi.top", name: "Team Porilekh" },
   });
 }

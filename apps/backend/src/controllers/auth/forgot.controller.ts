@@ -6,10 +6,10 @@ import { logger } from "@repo/logger/config";
 import { decodeTokenWithJwt, generateHashToken, signTokenWithJwt, verifyHashedToken } from "@/utils/oauth.ts";
 import { generateActionEmailTemplate } from "@/utils/actionTempletHtml.ts";
 import { redisClient } from "@/utils/redisClient.ts";
-import { getUserByEmail, getUserByIdWithPassword } from "@/db-red/user.ts";
+import { getUserByEmail, getUserByIdWithPassword } from "@/services/user.ts";
 import { BACKEND_URL, FRONTEND_URL } from "@/utils/envs.ts";
 import { validateResetPasswordTokenZodSchema } from "@repo/zod-schemas/config";
-import { updateUser } from "@/db-red/updateUser.ts";
+import { updateUser } from "@/services/updateUser.ts";
 
 export const forgotPasswordSendLink = asyncHandler(async function (
   req: express.Request,

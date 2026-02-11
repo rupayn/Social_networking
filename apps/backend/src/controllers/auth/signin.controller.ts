@@ -1,7 +1,7 @@
 import { asyncHandler, sendJsonResponse } from "../../utils/handler.ts";
 import express from "express";
 import { Provider } from "@/generated/prisma/enums.ts";
-import { getUserByEmailWithPassword } from "@/db-red/user.ts";
+import { getUserByEmailWithPassword } from "@/services/user.ts";
 import { prismaClient } from "@/utils/prismaClient.ts";
 import { generateHashToken, signTokenWithJwt, verifyHashedToken } from "@/utils/oauth.ts";
 import { NODE_ENV } from "@/utils/envs.ts";
@@ -82,3 +82,4 @@ export const signinController = asyncHandler(
     });
   }
 );
+// 

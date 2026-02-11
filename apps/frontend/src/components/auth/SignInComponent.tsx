@@ -10,6 +10,7 @@ import { useState } from "react";
 import { toast, Zoom } from "react-toastify";
 import { signInZodSchema } from "@repo/zod-schemas/config";
 import { useSignInMutation } from "../../redux/features/api/authApi.sclice";
+import { setAuthValues } from "../../redux/features/auth.slice";
 
 function SignInComponent() {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,6 +20,7 @@ function SignInComponent() {
   const [passwordData, setPasswordData] = useState<string>("");
   const [showPassword, setShowPassword] = useState(false);
   const [signin, { isLoading }]=useSignInMutation();
+  
   const handelSubmit = async function () {
     const result = signInZodSchema
       .pick({ email: true, password: true })
@@ -45,6 +47,7 @@ function SignInComponent() {
           draggable: true,
           transition: Zoom,
         });
+      dispatch(setAuthValues(response.user));
         navigate("/");
       }
     } catch (error) {

@@ -14,11 +14,12 @@
         "REDIRECT_URI",
         "JWT_ACCESS_SECRET",
         "SALT_ROUNDS",
-        "CLOUDINARY_CLOUD_NAME",
+        "VITE_CLOUDINARY_CLOUD_NAME",
         "BREVO_API_KEY",
         "REDIS_URL",
         "FRONTEND_URL",
-        "BACKEND_URL"
+        "BACKEND_URL",
+        "VITE_UPLOAD_PRESET"
       ],
       "outputs": [
         "build/**",

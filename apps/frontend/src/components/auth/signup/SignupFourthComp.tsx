@@ -1,7 +1,10 @@
-
-import React, { useEffect, useRef, useState } from 'react';
-import type { SignupDataFields } from '../../../hooks/useSignupForm';
-import UploadFile from '../../UploadFile';
+import React, { useEffect, useRef, useState } from "react";
+import type { SignupDataFields } from "../../../hooks/useSignupForm";
+import UploadFile from "../../UploadFile";
+import { toast, Zoom } from "react-toastify";
+import type { RootState } from "../../../redux/store";
+import { useSelector } from "react-redux";
+import { useUploadToCloudinaryMutation } from "../../../redux/features/api/cloudinaryApi.sclice";
 
 type Props = {
   dataFields: SignupDataFields;
@@ -9,15 +12,15 @@ type Props = {
   updateDataFields: (element: Partial<SignupDataFields>) => void;
 };
 function SignupFourthComp({ dataFields, prevStep, updateDataFields }: Props) {
-  const [file, setFile]= useState<File []>([]);
-  const [filePdf, setFilePdf]= useState<File []>([]);
+  const [fileImg, setFileImg] = useState<File[]>([]);
+  const [filePdf, setFilePdf] = useState<File[]>([]);
   const [uploaded, setUploaded] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [pdfPreview, setPdfPreview] = useState<string | null>(null);
   const pdfContainerRef = useRef<HTMLDivElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const dpRef=useRef<HTMLInputElement|null>(null)
+  const dpRef = useRef<HTMLInputElement | null>(null);
   const cvRef = useRef<HTMLInputElement | null>(null);
 
   const enterFullscreen = () => {
@@ -32,20 +35,95 @@ function SignupFourthComp({ dataFields, prevStep, updateDataFields }: Props) {
     }
   };
 
+  const theme = useSelector((state: RootState) => state?.theme.value);
+  const [uploadToCloudinary, { isLoading }] = useUploadToCloudinaryMutation();
+  const handelUpload = async function () {
+    const fromFiles: FormData[] = [];
+    const preset = import.meta.env.VITE_UPLOAD_PRESET;
+    if (!preset) return;
+    if (fileImg?.length) {
+      const formData = new FormData();
+      const fileName = `${fileImg[0].name.replaceAll(" ", "-").replaceAll(/\.[^/.]+$/, "")}-${Date.now()}-${crypto.randomUUID().slice(0, 5)}`;
+      formData.append("public_id", `profile/${fileName}`);
+      formData.append("tags", "temp");
+      formData.append("file", fileImg[0]);
+      formData.append("folder", "profile");
+      formData.append("upload_preset", preset);
+      fromFiles.push(formData);
+    }
+    if (filePdf?.length) {
+      const formData = new FormData();
+      const fileName = `${filePdf[0].name.replaceAll(" ", "-").replaceAll(/\.[^/.]+$/, "")}-${Date.now()}-${crypto.randomUUID().slice(0, 5)}`;
+      formData.append("public_id", `resume/${fileName}`);
+      formData.append("tags", "temp");
+      formData.append("file", filePdf[0]);
 
-  useEffect(()=>{
-    if(!file[0]) return
-    const objectUrl = URL.createObjectURL(file[0]);
+      formData.append("upload_preset", preset);
+      fromFiles.push(formData);
+    }
+    Promise.all(
+      fromFiles.map(async (fromData) => {
+        const response = await uploadToCloudinary(fromData).unwrap();
+
+        if (!response) return;
+
+        const publicId = fromData.get("public_id")?.toString();
+        const folder = publicId?.split("/")[0];
+
+        if (folder === "profile") {
+          updateDataFields({
+            avatar: response.secure_url,
+            avatar_id: response.public_id,
+          });
+        }
+
+        if (folder === "resume") {
+          updateDataFields({
+            resume: response.secure_url,
+            resume_id: response.public_id,
+          });
+        }
+
+        return true;
+      })
+    )
+      .then(() => {
+        toast.success("Files uploaded successfully", {
+          theme: theme === "dark" ? "light" : "dark",
+          position: "top-center",
+          closeOnClick: true,
+          draggable: true,
+          transition: Zoom,
+        });
+      })
+      .catch((error) => {
+        const message = error instanceof Error ? error.message : "Upload failed";
+        toast.error(`${message}`, {
+          theme: theme === "dark" ? "light" : "dark",
+          position: "top-center",
+          closeOnClick: true,
+          draggable: true,
+          transition: Zoom,
+        });
+      })
+      .finally(()=>{
+        setUploaded(true);
+      })
+    
+  };
+
+  useEffect(() => {
+    if (!fileImg[0]) return;
+    const objectUrl = URL.createObjectURL(fileImg[0]);
     setPreview(objectUrl);
     return () => URL.revokeObjectURL(objectUrl);
-  },[file])
-  useEffect(()=>{
-    if(!filePdf[0]) return
+  }, [fileImg]);
+  useEffect(() => {
+    if (!filePdf[0]) return;
     const objectUrl = URL.createObjectURL(filePdf[0]);
     setPdfPreview(objectUrl);
     return () => URL.revokeObjectURL(objectUrl);
-  },[filePdf])
-  console.log(file[0])
+  }, [filePdf]);
 
   useEffect(() => {
     const handleChange = () => {
@@ -55,7 +133,7 @@ function SignupFourthComp({ dataFields, prevStep, updateDataFields }: Props) {
     document.addEventListener("fullscreenchange", handleChange);
     return () => document.removeEventListener("fullscreenchange", handleChange);
   }, []);
-  
+
   return (
     <div
       className="relative w-full max-w-md mx-auto px-6 py-8 flex flex-col gap-5
@@ -70,7 +148,7 @@ function SignupFourthComp({ dataFields, prevStep, updateDataFields }: Props) {
                      text-gray-800 
                      ring-4 ring-black/10 dark:ring-white/10"
           style={{
-            backgroundImage: preview ? `url(${preview})` : undefined,
+            backgroundImage: preview ? dataFields.avatar || `url(${preview})` : undefined,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
@@ -92,13 +170,13 @@ function SignupFourthComp({ dataFields, prevStep, updateDataFields }: Props) {
             overflow-hidden text-center wrap-break-word
   
             ${
-              file.length > 0
+              fileImg.length > 0
                 ? "py-2 border-emerald-500 bg-emerald-500/10"
                 : "py-5 border-blue-500 bg-blue-500/10 hover:bg-blue-500/20"
             }
   
             ${
-              file.length > 0
+              fileImg.length > 0
                 ? "dark:border-emerald-400 dark:bg-emerald-400/10"
                 : "dark:border-blue-400 dark:bg-blue-400/10 dark:hover:bg-blue-400/20"
             }
@@ -107,13 +185,13 @@ function SignupFourthComp({ dataFields, prevStep, updateDataFields }: Props) {
           <UploadFile
             id="profile-image"
             className="bg-transparent text-sm text-gray-700 dark:text-gray-200"
-            onFileSelect={(fileArr) => setFile(fileArr)}
+            onFileSelect={(fileArr) => setFileImg(fileArr)}
             multiple={false}
             ref={dpRef}
             accept="image/png, image/jpeg"
           />
 
-          {file.length === 0 && (
+          {fileImg.length === 0 && (
             <span className="text-xs text-gray-950 dark:text-gray-400">
               Click to select Image (PNG / JPG)
             </span>
@@ -128,7 +206,7 @@ function SignupFourthComp({ dataFields, prevStep, updateDataFields }: Props) {
         {pdfPreview && (
           <div ref={pdfContainerRef} className="relative w-full">
             <iframe
-              src={`${pdfPreview}#zoom=70`}
+              src={dataFields.resume || `${pdfPreview}#zoom=70`}
               title="PDF Preview"
               className={`w-full ${
                 isFullscreen ? "h-screen" : preview ? "h-32" : "h-24"
@@ -191,17 +269,18 @@ function SignupFourthComp({ dataFields, prevStep, updateDataFields }: Props) {
         </button>
 
         <button
+          onClick={handelUpload}
           className="w-full bg-linear-to-r from-blue-600 to-indigo-600
                      text-white py-2 rounded-xl hover:from-blue-700
                      hover:to-indigo-700 transition font-semibold shadow"
         >
-          Upload
+          {uploaded ? "Next ->" : "skip For Now"}
         </button>
       </div>
     </div>
   );
-  
-  
 }
 
 export default SignupFourthComp;
+
+// (isLoading? "Uploading..." : "Upload")

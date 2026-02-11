@@ -1,7 +1,7 @@
 import express from "express";
 import { asyncHandler, sendJsonResponse } from "@/utils/handler.ts";
 import { generateHashToken, signTokenWithJwt, decodeTokenWithJwt } from "@/utils/oauth.ts";
-import { getUsersCheckValidRefreshToken } from "@/db-red/user.ts";
+import { getUsersCheckValidRefreshToken } from "@/services/user.ts";
 import { prismaClient } from "@/utils/prismaClient.ts";
 import { NODE_ENV } from "@/utils/envs.ts";
 

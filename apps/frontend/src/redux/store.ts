@@ -1,13 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import themeReducer from "./features/theme.slice";
-import signupReducer from "./features/signup.slice";
+import authReducer from "./features/auth.slice";
 import { postOfficeApi } from "./features/api/postOfficeApi.sclice";
 import  {authApi} from "./features/api/authApi.sclice";
 
 export const store = configureStore({
   reducer: {
     theme: themeReducer,
-    signup: signupReducer,
+     auth: authReducer,
     [postOfficeApi.reducerPath]: postOfficeApi.reducer,
     [authApi.reducerPath]: authApi.reducer
   },

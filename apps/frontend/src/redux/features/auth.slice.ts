@@ -1,14 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-export const signupSlice = createSlice({
-  name: "signup Slice",
-  initialState: {
+const initialState= {
     value: {
       email: "",
       name: "",
-      password: "",
       phone: "",
       bio: "",
+      role:"",
+      profileStatus:"",
       linkedin: "",
       github: "",
       website: "",
@@ -21,16 +19,24 @@ export const signupSlice = createSlice({
       state: "",
       country: "",
     },
-  },
+  }
+export const authSlice = createSlice({
+  name: "Auth Slice",
+  initialState,
   reducers: {
-    setSignUpValues: (state, action) => {
+    setAuthValues: (state, action) => {
       state.value = {
         ...state.value,
         ...action.payload,
       };
     },
+    setLogout:(state)=>{
+      state.value={
+        ...initialState.value
+      }
+    }
   },
 });
 
-export const { setSignUpValues } = signupSlice.actions;
-export default signupSlice.reducer;
+export const { setAuthValues } = authSlice.actions;
+export default authSlice.reducer;
