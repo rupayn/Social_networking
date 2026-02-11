@@ -9,6 +9,32 @@ function ForgetPasswordComponent() {
   const [email, setEmail] = React.useState<string>("");
   const theme = useSelector((state: RootState) => state?.theme.value);
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
+  const COOL_DOWN_TIME = 120; // 2 minutes in seconds
+  const [coolDown, setCoolDown] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    const storedTime = localStorage.getItem("forgot_password_timer");
+
+    if (storedTime) {
+      const remaining = Math.floor((Number(storedTime) - Date.now()) / 1000);
+
+      if (remaining > 0) {
+        setCoolDown(remaining);
+      } else {
+        localStorage.removeItem("forgot_password_timer");
+      }
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (coolDown <= 0) return;
+
+    const timer = setInterval(() => {
+      setCoolDown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [coolDown]);
 
   const handleSubmit = async function (e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -35,6 +61,13 @@ function ForgetPasswordComponent() {
           draggable: true,
           transition: Zoom,
         });
+        if (response?.success) {
+          const expiry = Date.now() + COOL_DOWN_TIME * 1000;
+
+          localStorage.setItem("forgot_password_timer", expiry.toString());
+
+          setCoolDown(COOL_DOWN_TIME);
+        }
       } else if (!response?.success) {
         toast.error(response?.message, {
           theme: theme === "dark" ? "light" : "dark",
@@ -44,15 +77,7 @@ function ForgetPasswordComponent() {
           transition: Zoom,
         });
       }
-      // if(response.error){
-      //   toast.error(response.error.data.message, {
-      //     theme: theme === "dark" ? "light" : "dark",
-      //     position: "top-center",
-      //     closeOnClick: true,
-      //     draggable: true,
-      //     transition: Zoom,
-      //   });
-      // }
+      
     } catch (error: unknown) {
       let errorMessage = "Something went wrong";
 
@@ -70,6 +95,7 @@ function ForgetPasswordComponent() {
         draggable: true,
         transition: Zoom,
       });
+      
     }
   };
   return (
@@ -101,14 +127,20 @@ function ForgetPasswordComponent() {
               "
           />
         </div>
+        {coolDown > 0 && (
+          <p className="text-sm text-red-500 font-semibold mt-2">
+            Please wait {coolDown} seconds before trying again.
+          </p>
+        )}
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || coolDown > 0}
           className="
             w-full py-2 rounded-md
             bg-blue-600 text-white font-semibold
             hover:bg-blue-700
             dark:bg-blue-500 dark:hover:bg-blue-600
+            disabled:opacity-50
             transition
           "
         >
