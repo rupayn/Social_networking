@@ -1,8 +1,9 @@
 import SignupFirstComp from "./signup/SignupFirstComp";
 import useSignupForm from "../../hooks/useSignupForm";
-import SignupSecondComp from "./signup/SignupSecondComp";
-import SignupThirdComp from "./signup/SignupThirdComp";
 import SignupFourthComp from "./signup/SignupFourthComp";
+import SignupThirdComp from "./signup/SignupThirdComp";
+import SignupSecondComp from "./signup/SignupSecondComp";
+import SignupFifthComp from "./signup/SignupFifthComp";
 
 function SignUpComponent() {
   const { step, dataFields, nextStep, prevStep, updateDataFields,backToFirst } = useSignupForm();
@@ -22,7 +23,9 @@ function SignUpComponent() {
       case 2:
         return <SignupThirdComp dataFields={dataFields} nextStep={nextStep} prevStep={prevStep} updateDataFields={updateDataFields} />
       case 3:
-        return <SignupFourthComp dataFields={dataFields} prevStep={prevStep} updateDataFields={updateDataFields}/>
+        return <SignupFourthComp dataFields={dataFields} prevStep={prevStep} updateDataFields={updateDataFields} nextStep={nextStep}/>
+      case 4:
+        return <SignupFifthComp dataFields={dataFields} prevStep={prevStep} updateDataFields={updateDataFields}/>
       default:
         backToFirst();
     }

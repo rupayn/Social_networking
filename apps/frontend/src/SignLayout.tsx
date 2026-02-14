@@ -6,16 +6,58 @@ import WaveSection from "./components/Wave";
 
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "./redux/store";
-import { setTheme } from "./redux/features/theme.slice";
-import { ToastContainer } from "react-toastify";
+import { setByValue, setTheme } from "./redux/features/theme.slice";
+import { toast, ToastContainer } from "react-toastify";
+import useNetworkStatus from "./hooks/useNetworkStatus";
+import { useEffect, useRef } from "react";
 
 function SigninLayout() {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useSelector((state: RootState) => state?.theme.value);
+  const isOnline=useNetworkStatus();
+  const hasBeenOffline = useRef(false);
 
+  useEffect(()=>{
+    const lightModeMediaQuery= window.matchMedia("(prefers-color-scheme: light)")
+    const darkModeMediaQuery= window.matchMedia("(prefers-color-scheme: dark)")
+    if(lightModeMediaQuery.matches){
+      dispatch(setByValue("light"))
+    }else if(darkModeMediaQuery.matches){
+      dispatch(setByValue("dark"))
+    };
+  },[])
+
+  useEffect(()=>{
+    
+    if (!isOnline) {
+    hasBeenOffline.current = true;
+
+    toast.info("No network connection", {
+      theme: theme === "dark" ? "light" : "dark",
+      position: "top-center",
+      closeOnClick: true,
+      draggable: true,
+      autoClose: false,
+    });
+
+    return;
+  }
+  
+  // If online AND user was offline before → show online toast
+  if (isOnline && hasBeenOffline.current) {
+
+    toast.info("Back Online", {
+      theme: theme === "dark" ? "light" : "dark",
+      position: "top-center",
+      closeOnClick: true,
+      draggable: true,
+      autoClose: 3000,
+    });
+  }
+  },[isOnline])
   return (
     <div
-      data-theme={theme || "light"}
+      data-theme={theme}
       className="bg-white dark:bg-gray-950 text-white w-screen h-screen flex flex-col items-center justify-center"
       style={{
         // 2. Make sure you use the 'pattern' variable here, and add quotes inside the url()
@@ -24,6 +66,7 @@ function SigninLayout() {
         backgroundSize: "180px 180px",
       }}
     >
+      
       <div className=" px-16 hidden sm:flex dark:bg-white/10 bg-black/60 backdrop-blur-sm w-full h-20 items-center justify-between  ">
         <div>
           <Link

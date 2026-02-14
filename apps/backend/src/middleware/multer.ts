@@ -7,6 +7,10 @@ export const multerUploadSingle = multer({
 });
 
 export const singleAvatar = multerUploadSingle.single("avatar");
+export const singleUploadDpAndCv= multerUploadSingle.fields([
+  { name: "avatar", maxCount: 1 },
+  { name: "resume", maxCount: 1 },
+]);
 export const multerUpload = multer({
   limits: {
     fileSize: 1024 * 1024 * 50, //50MB

@@ -16,7 +16,7 @@ import {
 import { signUpController } from "@/controllers/auth/signup.controller.ts";
 import { signoutController } from "@/controllers/auth/signout.controller.ts";
 import { checkTokens } from "@/middleware/checkRefreshToken.ts";
-import { verifyEmailController } from "@/controllers/auth/verify.email.controller.ts";
+import { sendVerifyEmailLinkController, verifyEmailController } from "@/controllers/auth/verify.email.controller.ts";
 
 const authRouter = Router();
 
@@ -61,7 +61,10 @@ export default authRouter;
 
 
 //  email verification route
-authRouter.route("/verify-email").post(verifyEmailController);
+authRouter.route("/send-verify-email-link").post(checkTokens,sendVerifyEmailLinkController);
+authRouter.route("/verify-email").get(verifyEmailController);
+
+// Forgot password routes
 authRouter.route("/forgot-password-send-link").post(validate(forgotPasswordSendLinkZodSchema),forgotPasswordSendLink)
 authRouter.route("/validate-reset-password-token").get(validateResetPasswordToken);
 authRouter.route("/reset-password").post(resetPasswordController);

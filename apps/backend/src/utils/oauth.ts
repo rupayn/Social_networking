@@ -12,7 +12,7 @@ import { JWT_ACCESS_SECRET, O_AUTH_CLIENT_ID, O_AUTH_CLIENT_SECRET, REDIRECT_URI
  *
  */
 
-export type TokenExpiry = "5m" | "15m" | "30m" | "1h" | "7d";
+export type TokenExpiry = "5m" | "15m" | "30m" | "1h" | "1d" | "7d";
 
 const JWT_SECRET: string = JWT_ACCESS_SECRET as string;
 export function signTokenWithJwt(data: string, expiresIn?: TokenExpiry): string {

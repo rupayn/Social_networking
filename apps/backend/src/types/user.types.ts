@@ -15,6 +15,37 @@ export const sessionSelect = {
   refreshTokenDateOfExpire: true,
   userAgent: true,
 } satisfies Prisma.SessionSelect;
+
+/*
+* Base Profile
+*/
+
+export const ProfileSelect={
+  id: true,
+  userId: true,
+  resume: true,
+  designation: true,
+  resume_id: true,
+  bio: true,
+  headline: true,
+  mode: true,
+  layout: true,
+
+  linkedin: true,
+  github: true,
+  twitter: true,
+  website: true,
+
+  contacts: true,
+  currentAddress: true,
+  createdAt: true,
+  updatedAt: true,
+
+  educations: true,
+  experiences: true,
+  skills: true,
+} 
+
 /**
  * Base user selection (without password)
  */
@@ -26,24 +57,15 @@ export const userSelect = {
   avatar: true,
   avatar_id: true,
   emailVerified: true,
+  emailVerifiedAt: true,
   createdAt: true,
   updatedAt: true,
   phone: true,
   provider: true,
-  resume: true,
-  resume_id: true,
+  permanentAddress: true,
+  profile: true,
   profileStatus: true,
   role: true,
-  bio: true,
-  dist: true,
-  city: true,
-  country: true,
-  linkedin: true,
-  github: true,
-  pinCode: true,
-  state: true,
-  twitter: true,
-  website: true,
 } satisfies Prisma.UserSelect;
 
 /**
@@ -69,13 +91,6 @@ export const userWithSessionsSelect = {
 export const userWithPasswordAndSessionsSelect = {
   ...userWithSessionsSelect,
   password: true,
-  Session: {
-    select: sessionSelect,
-  },
-} satisfies Prisma.UserSelect;
-export const userWithCompleteSessionsWithoutPasswordSelect = {
-  ...userWithSessionsSelect,
-  
   Session: {
     select: sessionSelect,
   },

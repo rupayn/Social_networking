@@ -9,32 +9,26 @@ import { prismaClient } from "@/utils/prismaClient.ts";
 import crypto from "crypto";
 import express from "express";
 import { ApiError } from "@/utils/customError.ts";
+import { ProfileSelect } from "@/types/user.types.ts";
+import { logger } from "@repo/logger/config";
 export const signUpController = asyncHandler(
   async (req: express.Request, res: express.Response) => {
-    const { name, email, password, phone, city, state, pinCode, country, bio } = req.body;
+    try {
+      const { name, email, password, phone, city, state, pinCode, country, bio,...rest } = req.body;
     const userExists = await getUserByEmail(email);
     if (userExists) {
       return sendJsonResponse(res, 400, { success: false, message: "User already exists" });
     }
     const passwordHash = await generateHashToken(password);
     const username = `${crypto.randomUUID()}`;
-    // `${String(email)
-    //   .split("@")[0]
-    //   ?.toLowerCase()
-    //   .replace(/[^a-z0-9]/g, "")
-    //   .slice(0, 12)}${crypto.randomBytes(3).toString("hex")}`;
+    // 
     const signupTransaction = await prismaClient.$transaction(async (tx) => {
-      const user=await commonSignUp(tx,{
+      const user=await commonSignUp(res,tx,{
         name,
         email,
         password: passwordHash,
         phone,
-        city,
         emailVerified: false,
-        bio: bio ?? `Hello i am ${name}`,
-        state,
-        pinCode,
-        country,
         provider: Provider.MANUAL,
         username,
       })
@@ -43,23 +37,6 @@ export const signUpController = asyncHandler(
       
     if(!user.user) throw new ApiError(400,user.message);
       
-    // const user = await prismaClient.user.create({
-    //   data: {
-    //     name,
-    //     email,
-    //     password: passwordHash,
-    //     phone,
-    //     city,
-    //     emailVerified: false,
-    //     bio: bio ?? `Hello i am ${name}`,
-    //     state,
-    //     pinCode,
-    //     country,
-    //     provider: Provider.MANUAL,
-    //     username,
-    //   },
-    // });
-
     const today = Date.now();
     const refreshToken = `${crypto.randomUUID()}`;
     const newRefreshDate = signTokenWithJwt(BigInt(today).toString(), "7d");
@@ -80,6 +57,34 @@ export const signUpController = asyncHandler(
         userAgent: req.headers["user-agent"],
       },
     });
+    
+    const profile=await tx.profile.create({
+      data:{
+        userId: user.user.id,
+        bio: bio || `Hello I am ${name}. I am new to Porilekh. Nice to meet you all!`,
+        github: rest.github || "",
+        linkedin: rest.linkedin || "",
+        twitter: rest.twitter || "",
+        website: rest.website || "",
+        resume:"",
+        resume_id:"",
+        headline:"",
+        designation:rest.designation || "",
+      },
+      select:ProfileSelect
+    });
+
+    const address=await tx.address.create({
+      data:{
+        city,
+        state,
+        pinCode,
+        country,
+        permanentUserId:user.user.id,
+      }
+    })
+    user.user.permanentAddress=address;
+    user.user.profile=profile;
     return {
       success: true,
       accessTokenSigned,
@@ -123,5 +128,9 @@ export const signUpController = asyncHandler(
       message: "User Signup successfully",
       user: userWithoutSession,
     });
+    } catch (error) {
+      logger.error("Error in signup controller: \n", error);
+      sendJsonResponse(res, 500, { success: false, message: "Internal server error" });
+    }
   }
 );

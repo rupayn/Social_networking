@@ -5,10 +5,12 @@ import { getUserByEmailWithPassword } from "@/services/user.ts";
 import { prismaClient } from "@/utils/prismaClient.ts";
 import { generateHashToken, signTokenWithJwt, verifyHashedToken } from "@/utils/oauth.ts";
 import { NODE_ENV } from "@/utils/envs.ts";
+import { logger } from "@repo/logger/config";
 
 export const signinController = asyncHandler(
   async (req: express.Request, res: express.Response) => {
-    const { email, password } = req.body;
+    try {
+      const { email, password } = req.body;
     const user = await getUserByEmailWithPassword(email);
     if (!user) {
       return sendJsonResponse(res, 404, { success: false, message: "User not found" });
@@ -80,6 +82,11 @@ export const signinController = asyncHandler(
       message: "Sign-in successful",
       user: restUser,
     });
+    } catch (error) {
+      logger.error("Error in signin controller: \n", error);
+
+      return sendJsonResponse(res, 500, { success: false, message: "Internal server error" });
+    }
   }
 );
 // 

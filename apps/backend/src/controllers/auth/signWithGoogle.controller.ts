@@ -15,6 +15,7 @@ import { Provider } from "@/generated/prisma/enums.ts";
 import { FRONTEND_URL, NODE_ENV } from "@/utils/envs.ts";
 
 import { commonSignUp } from "@/services/user.ts";
+import { logger } from "@repo/logger/config";
 
 // Sign With Google
 
@@ -36,7 +37,8 @@ export const signUpWithGoogleController = asyncHandler(
 
 export const signWithGoogleControllerCallback = asyncHandler(
   async (req: express.Request, res: express.Response) => {
-    const code = req.query.code as string;
+    try {
+      const code = req.query.code as string;
     if (!code) return res.sendStatus(400);
 
     const { tokens } = await googleOauth2Client.getToken(code);
@@ -48,19 +50,17 @@ export const signWithGoogleControllerCallback = asyncHandler(
     if (!data.email) return sendJsonResponse(res, 400, { message: "Email not provided by Google" });
     const username = `${String(data.email)
       .split("@")[0]
-      ?.toLowerCase()
-      .replace(/[^a-z0-9]/g, "")
-      .slice(0, 12)}${crypto.randomBytes(3).toString("hex")}`;
+      ?.toLowerCase()}${crypto.randomBytes(6).toString("hex")}`;
 
     const name= data.name ?? "User";
 
 
     const signupTransaction = await prismaClient.$transaction(async (tx) => {
-      const user = await commonSignUp(tx, {
+      const user = await commonSignUp(res,tx, {
         username,
         email: data.email as string,
         emailVerified: true,
-        bio: `Hello i am ${data.name}`,
+        emailVerifiedAt: new Date(),
         name,
         avatar: data.picture ?? undefined,
         provider: Provider.GOOGLE,
@@ -80,6 +80,22 @@ export const signWithGoogleControllerCallback = asyncHandler(
       const deviceId = crypto.randomUUID(); // unique device id to identify device
       const deviceIdToken = signTokenWithJwt(deviceId); // to verify device id later if needed it will store in client side
       const refresh_date = signTokenWithJwt(today.toString(), "7d");
+      await tx.profile.upsert({
+        where:{userId:user.user.id},
+        update:{},
+        create:{
+          userId:user.user.id,
+          bio: `Hello I am ${name} , I am new to Porilekh. Nice to meet you all!`,
+          github: "",
+          linkedin: "",
+          twitter: "",
+          website: "",
+          resume:"",
+          resume_id:"",
+          headline:""
+        }
+
+      })
       await tx.session.upsert({
         where: { userId: user.user.id },
         update: {
@@ -134,6 +150,10 @@ export const signWithGoogleControllerCallback = asyncHandler(
     });
 
     res.redirect(FRONTEND_URL);
+    } catch (error) {
+      logger.error("Error in Google Sign-In callback:", error);
+      return res.status(500).send( "<div style='color:red'>Internal Server Error</div>" );
+    }
   }
 );
 

@@ -9,10 +9,9 @@ export type SignupDataFields = {
   linkedin: string;
   github: string;
   website: string;
-  avatar: string;
-  avatar_id: string;
-  resume: string;
-  resume_id: string;
+  avatar: File|null;
+  twitter: string;
+  resume: File|null;
   pinCode: string;
   dist:string;
   city: string;
@@ -30,11 +29,10 @@ function useSignupForm() {
     bio: "",
     linkedin: "",
     github: "",
+    twitter: "",
     website: "",
-    avatar: "",
-    avatar_id: "",
-    resume: "",
-    resume_id: "",
+    avatar:  null,
+    resume:null,
     pinCode: "",
     city: "",
     state: "",

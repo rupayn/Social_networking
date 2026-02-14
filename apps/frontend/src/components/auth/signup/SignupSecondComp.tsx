@@ -15,19 +15,22 @@ type Props = {
   prevStep: () => void;
   updateDataFields: (element: Partial<SignupDataFields>) => void;
 };
-
-
-function SignupSecondComp({  dataFields, nextStep, prevStep, updateDataFields }: Props) {
+// 
+// SignupFourthComp
+function SignupSecondComp({ dataFields, nextStep, prevStep, updateDataFields }: Props) {
   const dispatch = useDispatch<AppDispatch>();
   const [nameData, setNameData] = useState<string>(dataFields.name);
   const [bioData, setBioData] = useState<string>(dataFields.bio);
   const [passwordData, setPasswordData] = useState<string>(dataFields.password);
   const [reEnterPasswordData, setReEnterPasswordData] = useState<string>("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showReEnterPassword, setShowReEnterPassword] = useState(false);
   const theme = useSelector((state: RootState) => state?.theme.value);
-  const [visible,setVisible]=useState(true);
-  setTimeout(()=>{setVisible(false)},5000);
-  const nextHandler=function(){
+  const [visible, setVisible] = useState(true);
+  setTimeout(() => {
+    setVisible(false);
+  }, 5000);
+  const nextHandler = function () {
     if (passwordData !== reEnterPasswordData) {
       toast.error(`Password not matched`, {
         theme: theme === "dark" ? "light" : "dark",
@@ -38,8 +41,10 @@ function SignupSecondComp({  dataFields, nextStep, prevStep, updateDataFields }:
       });
       return;
     }
-    const result = signUpZodSchema.pick({ name: true, password: true, bio: true }).safeParse({ name: nameData, password: passwordData, bio: bioData });
-    if(!result.success){
+    const result = signUpZodSchema
+      .pick({ name: true, password: true, bio: true })
+      .safeParse({ name: nameData, password: passwordData, bio: bioData });
+    if (!result.success) {
       toast.error(`${JSON.parse(result.error.message)[0].message}`, {
         theme: theme === "dark" ? "light" : "dark",
         position: "top-center",
@@ -51,11 +56,8 @@ function SignupSecondComp({  dataFields, nextStep, prevStep, updateDataFields }:
     }
     updateDataFields({ name: nameData, password: passwordData, bio: bioData });
     nextStep();
-    
-  }
-  
- 
-  
+  };
+
   return (
     <div className="relative w-full max-w-md mx-auto px-6 py-8 flex flex-col gap-5">
       {/* Theme toggle */}
@@ -120,13 +122,20 @@ function SignupSecondComp({  dataFields, nextStep, prevStep, updateDataFields }:
 
         <div className="relative">
           <input
-            type={"text"}
+            type={showReEnterPassword ? "text" : "password"}
             placeholder="Re-Enter password"
             value={reEnterPasswordData}
             onChange={(e) => setReEnterPasswordData(e.target.value)}
             className="w-full bg-gray-700 text-gray-100 border border-gray-600 rounded-full px-5 py-2.5 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
           />
-        </div>
+          <button
+          type="button"
+          onClick={() => setShowReEnterPassword((prev) => !prev)}
+          className="absolute inset-y-0 right-4 flex items-center text-xl text-gray-400 hover:text-gray-200"
+        >
+          {showReEnterPassword ? <PiEyeFill /> : <PiEyeClosedFill />}
+        </button>
+        </div>    
       </div>
       {/* Bio */}
       <div className="flex flex-col gap-1">
@@ -163,3 +172,4 @@ function SignupSecondComp({  dataFields, nextStep, prevStep, updateDataFields }:
 }
 
 export default SignupSecondComp;
+

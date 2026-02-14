@@ -11,7 +11,9 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   value: {
     email: "",           // User's email address
+    username: "",        // User's username
     name: "",            // User's full name
+    emailIsVerified: false, // Flag indicating if user's email is verified
     phone: "",           // User's phone number
     bio: "",             // User's biography/about section
     role: "",            // User's role (e.g., admin, user)
@@ -49,6 +51,7 @@ export const authSlice = createSlice({
         ...state.value,
         ...action.payload,
       };
+      console.log(state.value);
     },
 
     /**
@@ -65,7 +68,7 @@ export const authSlice = createSlice({
 });
 
 // Export action creators
-export const { setAuthValues } = authSlice.actions;
+export const { setAuthValues,setLogout } = authSlice.actions;
 
 // Export reducer as default - used to configure the Redux store
 export default authSlice.reducer;

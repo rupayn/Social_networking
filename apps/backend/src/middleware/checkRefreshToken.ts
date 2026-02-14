@@ -1,9 +1,15 @@
+(BigInt.prototype as unknown as { toJSON: () => string }).toJSON = function () {
+  return this.toString();
+};
+
+
 import express from "express";
 import { asyncHandler, sendJsonResponse } from "@/utils/handler.ts";
 import { generateHashToken, signTokenWithJwt, decodeTokenWithJwt } from "@/utils/oauth.ts";
-import { getUsersCheckValidRefreshToken } from "@/services/user.ts";
+import { getUserById, getUsersCheckValidRefreshToken } from "@/services/user.ts";
 import { prismaClient } from "@/utils/prismaClient.ts";
 import { NODE_ENV } from "@/utils/envs.ts";
+import { logger } from "@repo/logger/config";
 
 interface AccessTokenSubject {
   token: string;
@@ -12,7 +18,8 @@ interface AccessTokenSubject {
 
 export const checkTokens = asyncHandler(
   async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const refreshTokenDate = req.cookies["refresh_date"];
+    try {
+      const refreshTokenDate = req.cookies["refresh_date"];
     const accessToken = req.cookies["access_token"];
     if (accessToken) {
       const decodedAccessToken = decodeTokenWithJwt(accessToken).sub;
@@ -22,12 +29,22 @@ export const checkTokens = asyncHandler(
       if (typeof decodedAccessToken === "string") {
         const decodedAccess = JSON.parse(decodedAccessToken);
         const userId = decodedAccess.token;
+        const user=await getUserById(userId);
+        if(!user) {
+          return sendJsonResponse(res, 401, { success: false, message: "User not found" });
+        }
+        res.locals.userFromMiddleware = user;
         res.locals.userIdFromMiddleWare = userId;
         return next();
       }
       if (typeof decodedAccessToken === "object") {
         const decodedAccess = decodedAccessToken as AccessTokenSubject;
         const userId = decodedAccess.token;
+        const user=await getUserById(userId);
+        if(!user) {
+          return sendJsonResponse(res, 401, { success: false, message: "User not found" });
+        }
+        res.locals.userFromMiddleware = user;
         res.locals.userIdFromMiddleWare = userId;
         return next();
       }
@@ -55,7 +72,8 @@ export const checkTokens = asyncHandler(
 
     const deviceId = req.cookies["device_id"];
     if (!deviceId) {
-      return sendJsonResponse(res, 401, { success: false, message: "Device ID missing" });
+      logger.info("Device ID missing in checkTokens middleware");
+      return sendJsonResponse(res, 401, { success: false, message: "you have to login again" });
     }
     const decodedDeviceId = decodeTokenWithJwt(deviceId).sub;
     if (!decodedDeviceId) {
@@ -156,5 +174,9 @@ export const checkTokens = asyncHandler(
     res.locals.userFromMiddleware = session.user;
     res.locals.sessionFromMiddleware = session;
     next();
+    } catch (error) {
+      logger.error("Error in checkTokens middleware: \n", error);
+      return sendJsonResponse(res, 500, { success: false, message: "Internal server error" });
+    }
   }
 );

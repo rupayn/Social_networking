@@ -33,8 +33,11 @@ export const themeSlice = createSlice({
         state.value = "light";
       }
     },
+    setByValue: (state, action) => {
+      state.value = action.payload;
+    }
   },
 });
 
-export const { setTheme } = themeSlice.actions;
+export const { setTheme, setByValue } = themeSlice.actions;
 export default themeSlice.reducer;

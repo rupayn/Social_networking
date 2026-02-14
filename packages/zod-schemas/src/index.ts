@@ -50,22 +50,26 @@ export const signUpZodSchema = z
     city: z
       .string()
       .trim()
+      .regex(/^[a-zA-Z\s]+$/, "Invalid city name")
       .min(2, "City must be at least 2 characters")
       .max(100, "City name is too long"),
 
     state: z
       .string()
       .trim()
+      .regex(/^[a-zA-Z\s]+$/, "Invalid state name")
       .min(2, "State must be at least 2 characters")
       .max(100, "State name is too long"),
     dist: z
       .string()
       .trim()
+      .regex(/^[a-zA-Z\s]+$/, "Invalid district name")
       .min(2, "District must be at least 2 characters")
       .max(100, "District name is too long"),
     country: z
       .string()
       .trim()
+      .regex(/^[a-zA-Z\s]+$/, "Invalid country name")
       .min(2, "Country must be at least 2 characters")
       .max(100, "Country name is too long"),
 

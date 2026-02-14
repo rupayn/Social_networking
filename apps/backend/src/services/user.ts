@@ -3,7 +3,6 @@ import {
   UserDTO,
   userFindWithEmailIncludeSessionAndPasswordDTO,
   userSelect,
-  userWithCompleteSessionsWithoutPasswordSelect,
   userWithPasswordAndSessionsSelect,
   UserWithPasswordDTO,
   userWithPasswordSelect,
@@ -11,6 +10,7 @@ import {
   userWithSessionsSelect,
 } from "@/types/user.types.ts";
 import { prismaClient } from "@/utils/prismaClient.ts";
+import express from "express";
 import { getCache, setCache } from "@/utils/redisClient.ts";
 import {
   REFRESH_KEY,
@@ -22,6 +22,8 @@ import {
 import { Provider } from "@/generated/prisma/enums.ts";
 import { sendMail } from "@/utils/sendMail.ts";
 import { Prisma } from "@/generated/prisma/client.ts";
+import { logger } from "@repo/logger/config";
+
 
 export const getAllUsers = async (): Promise<UserWithSessionsDTO[]> => {
   const cacheKey = USER_ALL_KEY;
@@ -148,7 +150,7 @@ const htmlContent = (name: string, userName: string, provider: string) => `<div 
 
   <p style="font-size: 15px;">
     🎉 We are pleased to inform you that your registration on
-    <strong style="color: #2563eb;">Porilekh</strong> has been completed successfully. your${provider === "MANUAL" ? " temporary " : ""} username is <strong>${userName}</strong>${provider === "MANUAL" ? "<span style='color:#F5273C; font-weight:600'> ,<br/>Please verify your email address to get full access and a stable user name </span>" : ""}. 
+    <strong style="color: #2563eb;">Porilekh</strong> has been completed ${provider === "MANUAL"?"Partially":"successfully"}. your${provider === "MANUAL" ? " temporary " : ""} username is <strong>${userName}</strong>${provider === "MANUAL" ? "<span style='color:#F5273C; font-weight:600'> ,<br/>Please verify your email address to get full access and a stable user name </span>" : ""}. 
   </p>
 
   <p style="font-size: 15px;">
@@ -170,42 +172,21 @@ const htmlContent = (name: string, userName: string, provider: string) => `<div 
 </div>
 `;
 
-// type SignupDataFields = {
-
-//   email: string;
-//   name: string;
-//   username: string;
-//   password: string | null;
-//   phone: string | null;
-//   bio: string | null;
-//   linkedin: string | null;
-//   github: string | null;
-//   website: string | null;
-//   avatar: string | null;
-//   avatar_id: string | null;
-//   resume: string | null;
-//   resume_id: string | null;
-//   pinCode: string | null;
-//   dist: string | null;
-//   city: string | null;
-//   provider: Provider;
-//   state: string | null;
-//   country: string | null;
-//   emailVerified: boolean;
-// };
 
 type SignupDataFields = Omit<
   Prisma.UserCreateInput,
-  "id" | "createdAt" | "updatedAt" | "role" | "profileStatus" | "Session"
+  "id" | "createdAt" | "updatedAt" | "Session" | "Profile" | "role"
 >;
-export const commonSignUp = async function (tx: Prisma.TransactionClient, data: SignupDataFields) {
-  const existingUser = await tx.user.findUnique({
+
+export const commonSignUp = async function (_res:express.Response,tx: Prisma.TransactionClient, data: SignupDataFields) {
+  try {
+    const existingUser = await tx.user.findUnique({
     where: { email: data.email },
-    select: userWithCompleteSessionsWithoutPasswordSelect,
+    select: userWithSessionsSelect,
   });
   if (existingUser) {
     return {
-      success: false,
+      success: existingUser.provider !== Provider.MANUAL,
       message: "User already exists",
       user: existingUser.provider === Provider.MANUAL ? null : existingUser,
     };
@@ -214,7 +195,7 @@ export const commonSignUp = async function (tx: Prisma.TransactionClient, data: 
     data: {
       ...data,
     },
-    select: userWithCompleteSessionsWithoutPasswordSelect,
+    select: userWithSessionsSelect,
   });
 
   if (user) {
@@ -228,4 +209,8 @@ export const commonSignUp = async function (tx: Prisma.TransactionClient, data: 
     await setCache(USER_EMAIL_KEY(user.email), userWithoutSession);
   }
   return { success: true, message: "User created", user };
+  } catch (error: unknown) {
+    logger.error("Error in commonSignUp controller: \n", error);
+    return { success: false, message: "Internal server error", user: null };
+  }
 };

@@ -19,8 +19,8 @@ function SignInComponent() {
   const [emailData, setEmailData] = useState<string>("");
   const [passwordData, setPasswordData] = useState<string>("");
   const [showPassword, setShowPassword] = useState(false);
-  const [signin, { isLoading }]=useSignInMutation();
-  
+  const [signin, { isLoading }] = useSignInMutation();
+
   const handelSubmit = async function () {
     const result = signInZodSchema
       .pick({ email: true, password: true })
@@ -38,7 +38,7 @@ function SignInComponent() {
     }
 
     try {
-      const response = await  signin({ email: emailData, password: passwordData }).unwrap();
+      const response = await signin({ email: emailData, password: passwordData }).unwrap();
       if (response?.success) {
         toast.success(response?.message, {
           theme: theme === "dark" ? "light" : "dark",
@@ -47,33 +47,33 @@ function SignInComponent() {
           draggable: true,
           transition: Zoom,
         });
-      dispatch(setAuthValues(response.user));
+        
+        dispatch(setAuthValues(response.user));
         navigate("/");
       }
     } catch (error) {
       let errorMessage = "Something went wrong";
-      
-            if (typeof error === "object" && error !== null && "data" in error) {
-              const err = error as {
-                data?: { message?: string };
-              };
-      
-              errorMessage = err.data?.message || errorMessage;
-            }
-            
-            toast.error(`${errorMessage}`, {
-              theme: theme === "dark" ? "light" : "dark",
-              position: "top-center",
-              closeOnClick: true,
-              draggable: true,
-              transition: Zoom,
-            });
+
+      if (typeof error === "object" && error !== null && "data" in error) {
+        const err = error as {
+          data?: { message?: string };
+        };
+
+        errorMessage = err.data?.message || errorMessage;
+      }
+
+      toast.error(`${errorMessage}`, {
+        theme: theme === "dark" ? "light" : "dark",
+        position: "top-center",
+        closeOnClick: true,
+        draggable: true,
+        transition: Zoom,
+      });
     }
   };
 
   return (
     <div className="relative w-full max-w-md mx-auto px-6 py-8 flex flex-col items-center gap-3">
-
       <button
         onClick={() => {
           dispatch(setTheme());
@@ -90,18 +90,12 @@ function SignInComponent() {
         className="rounded-full h-20 w-20 border border-gray-600 shadow"
       />
 
-      <h2 className="text-lg font-semibold text-black dark:text-gray-100 -mt-2">
-        Sign In
-      </h2>
+      <h2 className="text-lg font-semibold text-black dark:text-gray-100 -mt-2">Sign In</h2>
 
       <div className="w-full flex flex-col gap-4">
-
         {/* Email */}
         <div className="flex flex-col gap-1">
-          <label
-            htmlFor="email"
-            className="text-sm font-medium text-black dark:text-gray-300"
-          >
+          <label htmlFor="email" className="text-sm font-medium text-black dark:text-gray-300">
             Email
           </label>
 
@@ -129,15 +123,11 @@ function SignInComponent() {
 
         {/* Password */}
         <div className="flex flex-col gap-1">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-black dark:text-gray-300"
-          >
+          <label htmlFor="password" className="text-sm font-medium text-black dark:text-gray-300">
             Password
           </label>
 
           <div className="relative">
-
             <input
               type={showPassword ? "text" : "password"}
               name="password"
@@ -179,15 +169,12 @@ function SignInComponent() {
             >
               {showPassword ? <PiEyeFill /> : <PiEyeClosedFill />}
             </button>
-
           </div>
         </div>
 
         {/* Forgot Password */}
-            <p className="text-right text-sm text-blue-950 font-bold dark:text-blue-500 hover:underline cursor-pointer">
-        <Link to="/forgot-password">
-          Forgot Password ??
-        </Link>
+        <p className="text-right text-sm text-blue-950 font-bold dark:text-blue-500 hover:underline cursor-pointer">
+          <Link to="/forgot-password">Forgot Password ??</Link>
         </p>
 
         <button
@@ -197,7 +184,6 @@ function SignInComponent() {
         >
           {isLoading ? "Loading..." : "Sign In"}
         </button>
-
       </div>
 
       {/* Divider */}
@@ -212,17 +198,12 @@ function SignInComponent() {
       {/* Sign Up */}
       <p className="text-sm text-black dark:text-gray-300 mt-2">
         Are you a new user?{" "}
-        <Link
-          to="/signup"
-          className="font-semibold underline hover:text-neutral-500"
-        >
+        <Link to="/signup" className="font-semibold underline hover:text-neutral-500">
           Sign Up
         </Link>
       </p>
-
     </div>
   );
 }
 
 export default SignInComponent;
-

@@ -117,7 +117,8 @@ export const validateResetPasswordToken = asyncHandler(async function (
   req: express.Request,
   res: express.Response
 ) {
-  const token =
+  try {
+    const token =
   typeof req.query.token === "string"
     ? req.query.token
     : "";
@@ -173,6 +174,13 @@ const code =
   await setCache(SHORT_SESSION_KEY(accessCode), JSON.stringify(shortSession),15*60);
 
   return res.redirect(`${FRONTEND_URL}/submit-new-password?token=${accessCode}`);
+  } catch (error) {
+    logger.error("Error in validateResetPasswordToken controller: \n", error);
+    return res
+      .status(500)
+      .type("html")
+      .send("<div style='color:red'>Internal server error</div>");
+  }
 });
 
 /**
@@ -196,7 +204,8 @@ export const resetPasswordController = asyncHandler(async function (
   req: express.Request,
   res: express.Response
 ) {
-  const {password, token} = req.body;
+ try {
+   const {password, token} = req.body;
   const session = await getCache<string>(SHORT_SESSION_KEY(token));
   if (!session){
     return sendJsonResponse(res, 401, { success: false, message: "Invalid token" });
@@ -217,4 +226,8 @@ export const resetPasswordController = asyncHandler(async function (
   await updateUser({id:user.id},{password:passwordHash});
   
   return sendJsonResponse(res, 200, { success: true, message: "Password reset successfully" });
+ } catch (error) {
+    logger.error("Error in resetPasswordController controller: \n", error);
+    return sendJsonResponse(res, 500, { success: false, message: "Internal server error" });
+ }
 });
