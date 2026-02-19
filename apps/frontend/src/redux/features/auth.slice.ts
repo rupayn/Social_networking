@@ -8,27 +8,117 @@ import { createSlice } from "@reduxjs/toolkit";
  * Contains an empty user profile object with all necessary user fields
  * initialized to empty strings
  */
-const initialState = {
+
+export interface AuthStateInterFace {
   value: {
-    email: "",           // User's email address
-    username: "",        // User's username
-    name: "",            // User's full name
-    emailIsVerified: false, // Flag indicating if user's email is verified
-    phone: "",           // User's phone number
-    bio: "",             // User's biography/about section
-    role: "",            // User's role (e.g., admin, user)
-    profileStatus: "",   // Status of user's profile (e.g., active, inactive)
-    linkedin: "",        // LinkedIn profile URL or username
-    github: "",          // GitHub profile URL or username
-    website: "",         // User's personal website URL
-    avatar: "",          // Avatar image URL
-    avatar_id: "",       // ID reference for the avatar image
-    resume: "",          // Resume file URL
-    resume_id: "",       // ID reference for the resume file
-    pinCode: "",         // Postal/PIN code for user's address
-    city: "",            // City of user's residence
-    state: "",           // State/Province of user's residence
-    country: "",         // Country of user's residence
+    id: string;
+    email: string;
+    username: string;
+    name: string;
+    emailVerified: boolean;
+    phone: string;
+    bio: string;
+    role: "RECRUITER" | "CANDIDATE" | "";
+    profileStatus: "active" | "suspended" | "deactivated" | "";
+    linkedin: string;
+    github: string;
+    website: string;
+    twitter?: string;
+    avatar: string;
+    avatar_id: string;
+    resume: string;
+    resume_id: string;
+    pinCode: string;
+    city: string;
+    state: string;
+    country: string;
+  };
+}
+
+type Provider = "GOOGLE" | "MANUAL";
+type Role = "RECRUITER" | "CANDIDATE";
+type ProfileStatus = "active" | "suspended" | "deactivated";
+
+interface PermanentAddress {
+  id: string;
+  permanentUserId: string;
+  currentProfileId: string | null;
+  city: string;
+  district: string | null;
+  state: string;
+  country: string;
+  pinCode: string;
+}
+
+interface Profile {
+  id: string;
+  userId: string;
+  resume: string | null;
+  resume_id: string | null;
+  designation: string;
+  headline: string;
+  bio: string;
+  mode: "light" | "dark";
+  layout: "default" | string;
+
+  linkedin: string;
+  github: string;
+  twitter: string;
+  website: string;
+
+  createdAt: string;
+  updatedAt: string;
+}
+
+
+
+interface user {
+  id: string;
+  email: string;
+  username: string;
+  name: string | null;
+
+  avatar: string | null;
+  avatar_id: string | null;
+
+  emailVerified: boolean;
+  emailVerifiedAt: string | null;
+
+  createdAt: string;
+  updatedAt: string;
+
+  phone: string | null;
+
+  provider: Provider;
+  role: Role;
+  profileStatus: ProfileStatus;
+
+  permanentAddress: PermanentAddress;
+  profile: Profile;
+}
+
+const initialState: AuthStateInterFace = {
+  value: {
+    id:"",
+    email: "",
+    username: "",
+    name: "",
+    emailVerified: false,
+    phone: "",
+    bio: "",
+    role: "",
+    profileStatus: "",
+    linkedin: "",
+    github: "",
+    website: "",
+    avatar: "",
+    avatar_id: "",
+    resume: "",
+    resume_id: "",
+    pinCode: "",
+    city: "",
+    state: "",
+    country: "",
   },
 };
 
@@ -37,7 +127,7 @@ const initialState = {
  * Provides actions to update and reset user information
  */
 export const authSlice = createSlice({
-  name: "Auth Slice",
+  name: "Auth_Slice",
   initialState,
   reducers: {
     /**
@@ -51,7 +141,6 @@ export const authSlice = createSlice({
         ...state.value,
         ...action.payload,
       };
-      console.log(state.value);
     },
 
     /**

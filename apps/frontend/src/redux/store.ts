@@ -27,20 +27,20 @@
 import { configureStore } from "@reduxjs/toolkit";
 import themeReducer from "./features/theme.slice";
 import authReducer from "./features/auth.slice";
-import { postOfficeApi } from "./features/api/postOfficeApi.sclice";
+import { utilsApi } from "./features/api/utilsApi.sclice";
 import  {authApi} from "./features/api/authApi.sclice";
 
 export const store = configureStore({
   reducer: {
     theme: themeReducer,
-     auth: authReducer,
-    [postOfficeApi.reducerPath]: postOfficeApi.reducer,
+    auth: authReducer,
+    [utilsApi.reducerPath]: utilsApi.reducer,
     [authApi.reducerPath]: authApi.reducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
     .concat(
-      postOfficeApi.middleware,
+      utilsApi.middleware,
       authApi.middleware
     ),
 });

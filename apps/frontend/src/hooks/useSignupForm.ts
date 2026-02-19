@@ -6,13 +6,15 @@ export type SignupDataFields = {
   password: string;
   phone: string;
   bio: string;
-  linkedin: string;
-  github: string;
-  website: string;
+  linkedin: string|undefined;
+  github: string|undefined;
+  website: string|undefined;
   avatar: File|null;
-  twitter: string;
+  twitter: string|undefined;
   resume: File|null;
   pinCode: string;
+  successPin:string;
+  enterManually:boolean;
   dist:string;
   city: string;
   state: string;
@@ -27,13 +29,15 @@ function useSignupForm() {
     password: "",
     phone: "",
     bio: "",
-    linkedin: "",
-    github: "",
-    twitter: "",
-    website: "",
+    linkedin: undefined,
+    github: undefined,
+    twitter: undefined,
+    website: undefined,
     avatar:  null,
     resume:null,
     pinCode: "",
+    successPin:"",
+    enterManually:false,
     city: "",
     state: "",
     country: "",

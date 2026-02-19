@@ -63,7 +63,7 @@ export const signUpZodSchema = z
     dist: z
       .string()
       .trim()
-      .regex(/^[a-zA-Z\s]+$/, "Invalid district name")
+      .regex(/^[a-zA-Z0-9\s]+$/, "Invalid district name")
       .min(2, "District must be at least 2 characters")
       .max(100, "District name is too long"),
     country: z
@@ -246,3 +246,17 @@ export const validateResetPasswordTokenZodSchema = z
       
   })
   .strict();
+
+
+/*
+ ********************************************************************************************************************************************************************************************************
+ *
+ *    Other Services in Schemas
+ *
+ * ********************************************************************************************************************************************************************************************************
+ */
+
+//  post office schema from pincode
+export const postOfficeFromPinCodeZodSchema = z.object({
+  pinCode: z.string().trim().length(6, "PIN code must be exactly 6 digits")
+}).strict();

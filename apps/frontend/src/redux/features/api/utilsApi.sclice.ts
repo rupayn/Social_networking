@@ -69,16 +69,14 @@ type ApiResponse = {
 };
 
 
-export const postOfficeApi = createApi({
-  reducerPath: "postOfficeApi",
+export const utilsApi = createApi({
+  reducerPath: "utilsApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: `https://api.data.gov.in/resource/`,
+    baseUrl: `${import.meta.env.VITE_API_BASE_URL}/utils/`,
   }),
   endpoints: (build) => ({
     getAddressFromPinCode: build.query<PostOffice[], string>({
-      query: (pin) => `5c2f62fe-5afa-4119-a499-fec9d604d5bd?api-key=${
-          import.meta.env.VITE_PIN_CODE_API_KEY
-        }&format=json&offset=0&filters%5Bpincode%5D=${pin}`,
+      query: (pin) => `/post-office?pinCode=${pin}`,
       transformResponse: (response: ApiResponse) => {
         // if (response[0]?.Status !== "Success" || !response[0]?.PostOffice) {
         //   return [];
@@ -97,4 +95,4 @@ export const postOfficeApi = createApi({
   }),
 });
 
-export const { useGetAddressFromPinCodeQuery } = postOfficeApi;
+export const { useGetAddressFromPinCodeQuery } = utilsApi;

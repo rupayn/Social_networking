@@ -10,3 +10,7 @@ export const BREVO_API_KEY=process.env.BREVO_API_KEY!;
 export const REDIS_URL=process.env.REDIS_URL!;
 export const FRONTEND_URL=process.env.FRONTEND_URL!;
 export const BACKEND_URL=process.env.BACKEND_URL!;
+export const PIN_CODE_API_KEY=process.env.PIN_CODE_API_KEY!;
+export const CLOUDINARY_API_SECRET=process.env.CLOUDINARY_API_SECRET!;
+export const CLOUDINARY_API_KEY=process.env.CLOUDINARY_API_KEY!;
+export const CLOUDINARY_CLOUD_NAME=process.env.CLOUDINARY_CLOUD_NAME!;

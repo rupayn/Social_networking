@@ -17,16 +17,17 @@ import { signUpController } from "@/controllers/auth/signup.controller.ts";
 import { signoutController } from "@/controllers/auth/signout.controller.ts";
 import { checkTokens } from "@/middleware/checkRefreshToken.ts";
 import { sendVerifyEmailLinkController, verifyEmailController } from "@/controllers/auth/verify.email.controller.ts";
+import { singleUploadDpAndCv } from "@/middleware/multer.ts";
 
 const authRouter = Router();
 
 /*
  ********************************************************************************************************************************************************************************************************
- *  Signup route
+ *  Sign routes
  ****************************************************************************************************
  ****************************************************************************************************
  */
-authRouter.route("/signup").post(validate(signUpZodSchema), signUpController);
+authRouter.route("/signup").post(singleUploadDpAndCv,validate(signUpZodSchema), signUpController);
 authRouter.route("/signin").post(validate(signInZodSchema), signinController);
 
 /**

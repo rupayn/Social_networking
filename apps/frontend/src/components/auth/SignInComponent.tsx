@@ -39,7 +39,7 @@ function SignInComponent() {
 
     try {
       const response = await signin({ email: emailData, password: passwordData }).unwrap();
-      if (response?.success) {
+      if (response?.success && response?.user && response?.user?.id) {
         toast.success(response?.message, {
           theme: theme === "dark" ? "light" : "dark",
           position: "top-center",

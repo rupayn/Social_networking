@@ -8,7 +8,7 @@ import type { SignupDataFields } from "../../../hooks/useSignupForm";
 import {
   useGetAddressFromPinCodeQuery,
   type PostOffice,
-} from "../../../redux/features/api/postOfficeApi.sclice";
+} from "../../../redux/features/api/utilsApi.sclice";
 import { toast, Zoom } from "react-toastify";
 import { signUpZodSchema } from "@repo/zod-schemas/config";
 
@@ -24,8 +24,9 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
   const dispatch = useDispatch<AppDispatch>();
   const theme = useSelector((state: RootState) => state.theme.value);
 
-  const [pin, setPin] = useState(dataFields.pinCode);
-  const [manualEntry, setManualEntry] = useState(false);
+  const [pin, setPin] = useState(dataFields.successPin || "");
+  const [manualEntry, setManualEntry] = useState(dataFields.enterManually || false);
+
 
   // RTK QUERY
   const {
@@ -47,12 +48,17 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
       dist: po.district,
       state: po.statename,
       country: "India",
+      
     });
+    if(pin.length === 6){
+      updateDataFields({successPin:pin});
+    }
   }, [offices, manualEntry]);
   const handlePinChange = (value: string) => {
     updateDataFields({ pinCode: value });
     setPin(value);
     setManualEntry(false);
+    updateDataFields({enterManually:false});
   };
 
   const handleSelectPostOffice = (name: string) => {
@@ -108,6 +114,10 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
         draggable: true,
         transition: Zoom,
       });
+      if(dataFields.successPin!==pin){
+        updateDataFields({pinCode:dataFields.successPin});
+        setPin(dataFields.successPin);  
+      }
     }
   }, [isError]);
   useEffect(()=>{
@@ -122,7 +132,7 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
     }
   },[isFetching])
   return (
-    <div className="relative w-full max-w-md mx-auto px-6 py-8 flex flex-col gap-5">
+    <div className="relative w-full max-w-md mx-auto px-6 py-2 flex flex-col gap-5">
       {/* THEME TOGGLE */}
       <button
         onClick={() => dispatch(setTheme())}
@@ -158,6 +168,7 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
           onChange={(e) => {
             updateDataFields({ city: e.target.value });
             setManualEntry(true);
+            updateDataFields({enterManually:true});
           }}
           className="w-full bg-gray-700 text-gray-100 border rounded-full px-5 py-2.5"
         />
@@ -180,7 +191,10 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
 
           <button
             type="button"
-            onClick={() => setManualEntry(true)}
+            onClick={() => {
+              updateDataFields({enterManually:true});
+              setManualEntry(true)
+            }}
             className="text-xs underline text-blue-500 self-start"
           >
             Enter manually

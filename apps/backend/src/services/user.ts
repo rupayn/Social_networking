@@ -24,7 +24,6 @@ import { sendMail } from "@/utils/sendMail.ts";
 import { Prisma } from "@/generated/prisma/client.ts";
 import { logger } from "@repo/logger/config";
 
-
 export const getAllUsers = async (): Promise<UserWithSessionsDTO[]> => {
   const cacheKey = USER_ALL_KEY;
   const cached = await getCache<UserWithSessionsDTO[]>(cacheKey);
@@ -150,7 +149,7 @@ const htmlContent = (name: string, userName: string, provider: string) => `<div 
 
   <p style="font-size: 15px;">
     🎉 We are pleased to inform you that your registration on
-    <strong style="color: #2563eb;">Porilekh</strong> has been completed ${provider === "MANUAL"?"Partially":"successfully"}. your${provider === "MANUAL" ? " temporary " : ""} username is <strong>${userName}</strong>${provider === "MANUAL" ? "<span style='color:#F5273C; font-weight:600'> ,<br/>Please verify your email address to get full access and a stable user name </span>" : ""}. 
+    <strong style="color: #2563eb;">Porilekh</strong> has been completed ${provider === "MANUAL" ? "Partially" : "successfully"}. your${provider === "MANUAL" ? " temporary " : ""} username is <strong>${userName}</strong>${provider === "MANUAL" ? "<span style='color:#F5273C; font-weight:600'> ,<br/>Please verify your email address to get full access and a stable user name </span>" : ""}. 
   </p>
 
   <p style="font-size: 15px;">
@@ -172,43 +171,45 @@ const htmlContent = (name: string, userName: string, provider: string) => `<div 
 </div>
 `;
 
-
-type SignupDataFields = Omit<
+export type SignupDataFieldsCommonSignUp = Omit<
   Prisma.UserCreateInput,
   "id" | "createdAt" | "updatedAt" | "Session" | "Profile" | "role"
 >;
 
-export const commonSignUp = async function (_res:express.Response,tx: Prisma.TransactionClient, data: SignupDataFields) {
+export const commonSignUp = async function (
+  _res: express.Response,
+  tx: Prisma.TransactionClient,
+  data: SignupDataFieldsCommonSignUp,
+) {
   try {
     const existingUser = await tx.user.findUnique({
-    where: { email: data.email },
-    select: userWithSessionsSelect,
-  });
-  if (existingUser) {
-    return {
-      success: existingUser.provider !== Provider.MANUAL,
-      message: "User already exists",
-      user: existingUser.provider === Provider.MANUAL ? null : existingUser,
-    };
-  }
-  const user = await tx.user.create({
-    data: {
-      ...data,
-    },
-    select: userWithSessionsSelect,
-  });
+      where: { email: data.email },
+      select: userWithSessionsSelect,
+    });
+    if (existingUser) {
+      return {
+        success: existingUser.provider !== Provider.MANUAL,
+        message: "User already exists",
+        user: existingUser.provider === Provider.MANUAL ? null : existingUser,
+      };
+    }
+    
+    const user = await tx.user.create({
+      data,
+      select: userWithSessionsSelect,
+    });
 
-  if (user) {
-    await sendMail(
-      "Welcome to Porilekh",
-      htmlContent(user.name || "User", user.username, user.provider),
-      user.email,
-      user.name || "User"
-    );
-    const { Session: _, ...userWithoutSession } = user;
-    await setCache(USER_EMAIL_KEY(user.email), userWithoutSession);
-  }
-  return { success: true, message: "User created", user };
+    if (user) {
+      await sendMail(
+        "Welcome to Porilekh",
+        htmlContent(user.name || "User", user.username, user.provider),
+        user.email,
+        user.name || "User"
+      );
+      const { Session: _, ...userWithoutSession } = user;
+      await setCache(USER_EMAIL_KEY(user.email), userWithoutSession);
+    }
+    return { success: true, message: "User created", user };
   } catch (error: unknown) {
     logger.error("Error in commonSignUp controller: \n", error);
     return { success: false, message: "Internal server error", user: null };

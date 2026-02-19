@@ -1,17 +1,41 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+{
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+   error: AggregateError [ETIMEDOUT]: 
 
-generator client {
-  provider = "prisma-client-js"
-}
+       at internalConnectMultiple (node:net:1134:18)
 
+       at internalConnectMultiple (node:net:1210:5)
 
-datasource db {
-  provider = "postgresql"
-  
-}
+       at internalConnectMultiple (node:net:1210:5)
 
-node --experimental-vm-modules ./node_modules/.bin/jest
+       at internalConnectMultiple (node:net:1210:5)
+
+       at internalConnectMultiple (node:net:1210:5)
+
+       at Timeout.internalConnectMultipleTimeout (node:net:1742:5)
+
+       at listOnTimeout (node:internal/timers:590:11)
+
+       at process.processTimers (node:internal/timers:523:7) {
+
+     code: 'ETIMEDOUT',
+
+     [errors]: [
+
+       [Error], [Error],
+
+       [Error], [Error],
+
+       [Error], [Error],
+
+       [Error], [Error],
+
+       [Error], [Error],
+
+       [Error], [Error]
+
+     ]
+
+   }
+
+ }

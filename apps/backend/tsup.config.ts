@@ -6,6 +6,7 @@ export default defineConfig((options: Options) => ({
   format: ["esm"],
 
   target: "ES2022",
-
+  splitting: false,
+  external: ["cloudinary"],
   ...options,
 }));

@@ -11,6 +11,7 @@ import { Provider } from "react-redux";
 import { store } from "./redux/store.ts";
 import ResetPasswordComponent from "./components/auth/ResetPasswordComponent.tsx";
 import ForgetPasswordComponent from "./components/auth/ForgetPasswordComponent.tsx";
+import Home from "./components/landing/Home.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -24,7 +25,7 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/submit-new-password" element={<ResetPasswordComponent />} />
           </Route>
           <Route element={<App />}>
-            <Route path="/" element={<App />} />
+            <Route path="/" element={<Home />} />
             <Route path="*" element={<PageNotFound />} />
           </Route>
         </Routes>

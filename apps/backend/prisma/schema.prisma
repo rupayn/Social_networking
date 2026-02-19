@@ -91,6 +91,28 @@ model Profile {
   educations  Education[]
   experiences Experience[]
   skills      Skill[]
+  projects    Projects[]
+}
+
+model Projects {
+  id          String   @id @default(cuid())
+  profileId   String
+  profile     Profile  @relation(fields: profileId, references: id, onDelete: Cascade)
+
+  name        String
+  description String?
+  liveLink        String?
+  githubLink  String?
+  technologies String?
+  startDate   DateTime?
+  endDate     DateTime?
+  projectType ProjectType
+  myContribution String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([profileId])
 }
 
 // ===================================
@@ -249,4 +271,10 @@ enum Mode {
 
 enum Layout {
   default
+}
+
+enum ProjectType {
+  PERSONAL
+  ACADEMIC
+  PROFESSIONAL
 }

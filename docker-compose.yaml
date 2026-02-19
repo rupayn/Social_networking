@@ -66,6 +66,7 @@ services:
       CHOKIDAR_USEPOLLING: "true"
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      NODE_OPTIONS: "--network-family-autoselection-attempt-timeout=500"
 
   frontend:
     container_name: frontend
