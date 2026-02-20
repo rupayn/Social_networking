@@ -219,7 +219,6 @@ export const updateUserZodSchema = z.object({
   website: urlField.optional(),
 });
 
-
 //  Forgot Password:
 export const forgotPasswordSendLinkZodSchema = z
   .object({
@@ -231,22 +230,13 @@ export const forgotPasswordSendLinkZodSchema = z
   })
   .strict();
 
-
 export const validateResetPasswordTokenZodSchema = z
   .object({
-    token: z
-      .string()
-      .trim()
-      .min(10, "Token must be at least 10 characters"),
+    token: z.string().trim().min(10, "Token must be at least 10 characters"),
 
-    code: z
-      .string()
-      .trim()
-      .min(4, "Code must be at least 4 characters")
-      
+    code: z.string().trim().min(4, "Code must be at least 4 characters"),
   })
   .strict();
-
 
 /*
  ********************************************************************************************************************************************************************************************************
@@ -257,6 +247,8 @@ export const validateResetPasswordTokenZodSchema = z
  */
 
 //  post office schema from pincode
-export const postOfficeFromPinCodeZodSchema = z.object({
-  pinCode: z.string().trim().length(6, "PIN code must be exactly 6 digits")
-}).strict();
+export const postOfficeFromPinCodeZodSchema = z
+  .object({
+    pinCode: z.string().trim().length(6, "PIN code must be exactly 6 digits"),
+  })
+  .strict();

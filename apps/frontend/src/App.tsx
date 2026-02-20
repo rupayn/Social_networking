@@ -9,20 +9,20 @@ import { setByValue } from "./redux/features/theme.slice";
 function App() {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useSelector((state: RootState) => state?.theme.value);
-  const isOnline=useNetworkStatus();
-  useEffect(()=>{
-      const lightModeMediaQuery= window.matchMedia("(prefers-color-scheme: light)")
-      const darkModeMediaQuery= window.matchMedia("(prefers-color-scheme: dark)")
-      if(lightModeMediaQuery.matches){
-        dispatch(setByValue("light"))
-      }else if(darkModeMediaQuery.matches){
-        dispatch(setByValue("dark"))
-      };
-    },[])
+  const isOnline = useNetworkStatus();
+  useEffect(() => {
+    const lightModeMediaQuery = window.matchMedia("(prefers-color-scheme: light)");
+    const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    if (lightModeMediaQuery.matches) {
+      dispatch(setByValue("light"));
+    } else if (darkModeMediaQuery.matches) {
+      dispatch(setByValue("dark"));
+    }
+  }, []);
   return (
     <>
       <div data-theme={theme}>
-        {isOnline?"":"No network connection"}
+        {isOnline ? "" : "No network connection"}
         <Outlet />
       </div>
     </>

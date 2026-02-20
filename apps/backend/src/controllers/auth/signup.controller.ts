@@ -32,7 +32,6 @@ export const signUpController = asyncHandler(
       const { name, email, password, phone, city, state, pinCode, country, bio, ...rest } =
         req.body;
 
-
       const userExists = await getUserByEmail(email);
       if (userExists) {
         return sendJsonResponse(res, 400, { success: false, message: "User already exists" });
@@ -55,7 +54,7 @@ export const signUpController = asyncHandler(
       if (resume) {
         const upload = await uploadToCloudinary(resume.path, {
           folder: "resume",
-          
+
           public_id: resume.filename,
         });
         if (!upload) {
@@ -77,7 +76,11 @@ export const signUpController = asyncHandler(
           avatar_id: uploadData.avatarPublicId,
         } as SignupDataFieldsCommonSignUp;
         const user = await commonSignUp(res, tx, data);
-
+        if (avatar) {
+          await fs.unlink(avatar.path).catch(() => {
+            logger.error("Temp cleanup failed in signup controller: \n", avatar.path);
+          });
+        }
         if (!user.success) throw new ApiError(400, user.message);
 
         if (!user.user) throw new ApiError(400, user.message);
@@ -133,6 +136,11 @@ export const signUpController = asyncHandler(
         });
         user.user.permanentAddress = address;
         user.user.profile = profile;
+        if (resume) {
+          await fs.unlink(resume.path).catch(() => {
+            logger.error("Temp cleanup failed in signup controller: \n", resume.path);
+          });
+        }
         return {
           success: true,
           accessTokenSigned,
@@ -180,17 +188,14 @@ export const signUpController = asyncHandler(
       });
     } catch (error) {
       try {
-
         if (uploadData.avatarPublicId) {
           await deleteFilesFromCloudinary([uploadData.avatarPublicId]);
         }
         if (uploadData.resumePublicId) {
           await deleteFilesFromCloudinary([uploadData.resumePublicId]);
         }
-        if(resume){
-          await fs.unlink(resume.path).catch(() => {
-            
-          });
+        if (resume) {
+          await fs.unlink(resume.path).catch(() => {});
         }
       } catch (cleanupError) {
         logger.warn("Cloudinary cleanup failed: \n", cleanupError);

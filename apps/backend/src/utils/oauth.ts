@@ -3,7 +3,13 @@ import { google } from "googleapis";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { JWT_ACCESS_SECRET, O_AUTH_CLIENT_ID, O_AUTH_CLIENT_SECRET, REDIRECT_URI, SALT_ROUNDS } from "./envs.ts";
+import {
+  JWT_ACCESS_SECRET,
+  O_AUTH_CLIENT_ID,
+  O_AUTH_CLIENT_SECRET,
+  REDIRECT_URI,
+  SALT_ROUNDS,
+} from "./envs.ts";
 
 /**
  *

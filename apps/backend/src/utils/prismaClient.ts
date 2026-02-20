@@ -17,4 +17,3 @@ const prismaClient =
 if (NODE_ENV === "development") globalForPrisma.prisma = prismaClient;
 
 export { prismaClient };
-

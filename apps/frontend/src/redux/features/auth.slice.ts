@@ -9,32 +9,6 @@ import { createSlice } from "@reduxjs/toolkit";
  * initialized to empty strings
  */
 
-export interface AuthStateInterFace {
-  value: {
-    id: string;
-    email: string;
-    username: string;
-    name: string;
-    emailVerified: boolean;
-    phone: string;
-    bio: string;
-    role: "RECRUITER" | "CANDIDATE" | "";
-    profileStatus: "active" | "suspended" | "deactivated" | "";
-    linkedin: string;
-    github: string;
-    website: string;
-    twitter?: string;
-    avatar: string;
-    avatar_id: string;
-    resume: string;
-    resume_id: string;
-    pinCode: string;
-    city: string;
-    state: string;
-    country: string;
-  };
-}
-
 type Provider = "GOOGLE" | "MANUAL";
 type Role = "RECRUITER" | "CANDIDATE";
 type ProfileStatus = "active" | "suspended" | "deactivated";
@@ -70,55 +44,82 @@ interface Profile {
   updatedAt: string;
 }
 
+export interface AuthStateInterFace {
+  value: {
+    id: string;
+    email: string;
+    username: string;
+    name: string | null;
 
+    avatar: string | null;
+    avatar_id: string | null;
 
-interface user {
-  id: string;
-  email: string;
-  username: string;
-  name: string | null;
+    emailVerified: boolean;
+    emailVerifiedAt: string | null;
 
-  avatar: string | null;
-  avatar_id: string | null;
+    createdAt: string;
+    updatedAt: string;
 
-  emailVerified: boolean;
-  emailVerifiedAt: string | null;
+    phone: string | null;
 
-  createdAt: string;
-  updatedAt: string;
+    provider: Provider;
+    role: Role;
+    profileStatus: ProfileStatus;
 
-  phone: string | null;
-
-  provider: Provider;
-  role: Role;
-  profileStatus: ProfileStatus;
-
-  permanentAddress: PermanentAddress;
-  profile: Profile;
+    permanentAddress: PermanentAddress;
+    profile: Profile;
+  };
 }
 
 const initialState: AuthStateInterFace = {
   value: {
-    id:"",
+    id: "",
     email: "",
     username: "",
     name: "",
-    emailVerified: false,
-    phone: "",
-    bio: "",
-    role: "",
-    profileStatus: "",
-    linkedin: "",
-    github: "",
-    website: "",
+
     avatar: "",
     avatar_id: "",
-    resume: "",
-    resume_id: "",
-    pinCode: "",
-    city: "",
-    state: "",
-    country: "",
+
+    emailVerified: false,
+    emailVerifiedAt: "",
+
+    createdAt: "",
+    updatedAt: "",
+
+    phone: "",
+
+    provider: "MANUAL",
+    role: "CANDIDATE",
+    profileStatus: "active",
+
+    permanentAddress: {
+      id: "",
+      permanentUserId: "",
+      currentProfileId: "",
+      city: "",
+      district: "",
+      state: "",
+      country: "",
+      pinCode: "",
+    },
+    profile: {
+      id: "",
+      userId: "",
+      resume: "",
+      resume_id: "",
+      designation: "",
+      headline: "",
+      bio: "",
+      mode: "light",
+      layout: "default",
+      linkedin: "",
+      github: "",
+      twitter: "",
+      website: "",
+      createdAt: "",
+      updatedAt: "",
+    },
   },
 };
 
@@ -157,7 +158,7 @@ export const authSlice = createSlice({
 });
 
 // Export action creators
-export const { setAuthValues,setLogout } = authSlice.actions;
+export const { setAuthValues, setLogout } = authSlice.actions;
 
 // Export reducer as default - used to configure the Redux store
 export default authSlice.reducer;

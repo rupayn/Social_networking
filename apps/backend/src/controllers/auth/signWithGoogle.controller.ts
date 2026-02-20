@@ -39,170 +39,146 @@ export const signWithGoogleControllerCallback = asyncHandler(
   async (req: express.Request, res: express.Response) => {
     try {
       const code = req.query.code as string;
-    if (!code) return res.sendStatus(400);
+      if (!code) return res.sendStatus(400);
 
-    const { tokens } = await googleOauth2Client.getToken(code);
-    googleOauth2Client.setCredentials(tokens);
+      const { tokens } = await googleOauth2Client.getToken(code);
+      googleOauth2Client.setCredentials(tokens);
 
-    const oauth2 = google.oauth2({ version: "v2", auth: googleOauth2Client });
-    const { data } = await oauth2.userinfo.get();
+      const oauth2 = google.oauth2({ version: "v2", auth: googleOauth2Client });
+      const { data } = await oauth2.userinfo.get();
 
-    if (!data.email) return sendJsonResponse(res, 400, { message: "Email not provided by Google" });
-    const username = `${String(data.email)
-      .split("@")[0]
-      ?.toLowerCase()}${crypto.randomBytes(6).toString("hex")}`;
+      if (!data.email)
+        return sendJsonResponse(res, 400, { message: "Email not provided by Google" });
+      const username = `${String(data.email)
+        .split("@")[0]
+        ?.toLowerCase()}${crypto.randomBytes(6).toString("hex")}`;
 
-    const name= data.name ?? "User";
+      const name = data.name ?? "User";
 
+      const signupTransaction = await prismaClient.$transaction(async (tx) => {
+        const user = await commonSignUp(res, tx, {
+          username,
+          email: data.email as string,
+          emailVerified: true,
+          emailVerifiedAt: new Date(),
+          name,
+          avatar: data.picture ?? undefined,
+          provider: Provider.GOOGLE,
+        });
+        if (!user.success && user.user === null)
+          return { success: false, message: user.message, accessToken: null };
+        if (user.user === null) return { success: false, message: user.message, accessToken: null };
+        // res.sendStatus(400).json({ message: user.message });
+        const accessTokenContent = {
+          token: user.user.id.toString(),
+          access: await generateHashToken(crypto.randomUUID()),
+        };
 
-    const signupTransaction = await prismaClient.$transaction(async (tx) => {
-      const user = await commonSignUp(res,tx, {
-        username,
-        email: data.email as string,
-        emailVerified: true,
-        emailVerifiedAt: new Date(),
-        name,
-        avatar: data.picture ?? undefined,
-        provider: Provider.GOOGLE,
+        const accessToken = signTokenWithJwt(JSON.stringify(accessTokenContent), "15m");
+        const refreshToken = `${crypto.randomUUID()}`;
+        const today = Date.now();
+        const deviceId = crypto.randomUUID(); // unique device id to identify device
+        const deviceIdToken = signTokenWithJwt(deviceId); // to verify device id later if needed it will store in client side
+        const refresh_date = signTokenWithJwt(today.toString(), "7d");
+        await tx.profile.upsert({
+          where: { userId: user.user.id },
+          update: {},
+          create: {
+            userId: user.user.id,
+            bio: `Hello I am ${name} , I am new to Porilekh. Nice to meet you all!`,
+            github: "",
+            linkedin: "",
+            twitter: "",
+            website: "",
+            resume: "",
+            resume_id: "",
+            headline: "",
+          },
+        });
+        await tx.session.upsert({
+          where: { userId: user.user.id },
+          update: {
+            deviceId: deviceId,
+            refreshToken: refreshToken,
+            refreshTokenDateOfExpire: BigInt(today + 7 * 24 * 60 * 60 * 1000),
+            userAgent: req.headers["user-agent"],
+            active: true,
+          },
+          create: {
+            userId: user.user.id,
+            refreshToken: refreshToken,
+            userAgent: req.headers["user-agent"],
+            deviceId,
+            refreshTokenDateOfExpire: BigInt(today + 7 * 24 * 60 * 60 * 1000),
+          },
+        });
+        return {
+          success: true,
+          accessToken,
+          refreshToken,
+          refresh_date,
+          deviceIdToken,
+          user: user.user,
+        };
       });
-      if (!user.success && user.user === null)
-        return { success: false, message: user.message, accessToken: null };
-      if (user.user === null) return { success: false, message: user.message, accessToken: null };
-      // res.sendStatus(400).json({ message: user.message });
-      const accessTokenContent = {
-        token: user.user.id.toString(),
-        access: await generateHashToken(crypto.randomUUID()),
-      };
 
-      const accessToken = signTokenWithJwt(JSON.stringify(accessTokenContent), "15m");
-      const refreshToken = `${crypto.randomUUID()}`;
-      const today = Date.now();
-      const deviceId = crypto.randomUUID(); // unique device id to identify device
-      const deviceIdToken = signTokenWithJwt(deviceId); // to verify device id later if needed it will store in client side
-      const refresh_date = signTokenWithJwt(today.toString(), "7d");
-      await tx.profile.upsert({
-        where:{userId:user.user.id},
-        update:{},
-        create:{
-          userId:user.user.id,
-          bio: `Hello I am ${name} , I am new to Porilekh. Nice to meet you all!`,
-          github: "",
-          linkedin: "",
-          twitter: "",
-          website: "",
-          resume:"",
-          resume_id:"",
-          headline:""
+      if (!signupTransaction.success)
+        return res.sendStatus(400).json({ message: signupTransaction.message });
+
+      res.cookie("access_token", signupTransaction.accessToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: NODE_ENV === "development" ? false : true, // true in prod
+        maxAge: 15 * 60 * 1000,
+      });
+      res.cookie("refresh_date", signupTransaction.refresh_date, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: NODE_ENV === "development" ? false : true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      res.cookie("device_id", signupTransaction.deviceIdToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: NODE_ENV === "development" ? false : true,
+      });
+      res.cookie(
+        "refresh_token",
+        signTokenWithJwt(signupTransaction.refreshToken as string, "7d"),
+        {
+          httpOnly: true,
+          sameSite: "lax",
+          secure: NODE_ENV === "development" ? false : true,
+          maxAge: 7 * 24 * 60 * 60 * 1000,
         }
+      );
 
-      })
-      await tx.session.upsert({
-        where: { userId: user.user.id },
-        update: {
-          deviceId: deviceId,
-          refreshToken: refreshToken,
-          refreshTokenDateOfExpire: BigInt(today + 7 * 24 * 60 * 60 * 1000),
-          userAgent: req.headers["user-agent"],
-          active: true,
-        },
-        create: {
-          userId: user.user.id,
-          refreshToken: refreshToken,
-          userAgent: req.headers["user-agent"],
-          deviceId,
-          refreshTokenDateOfExpire: BigInt(today + 7 * 24 * 60 * 60 * 1000),
-        },
-      });
-      return {
-        success: true,
-        accessToken,
-        refreshToken,
-        refresh_date,
-        deviceIdToken,
-        user: user.user,
-      };
-    });
-
-    if(!signupTransaction.success) return res.sendStatus(400).json({ message: signupTransaction.message });
-
-    res.cookie("access_token", signupTransaction.accessToken, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: NODE_ENV === "development" ? false : true, // true in prod
-      maxAge: 15 * 60 * 1000,
-    });
-    res.cookie("refresh_date", signupTransaction.refresh_date, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: NODE_ENV === "development" ? false : true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-    res.cookie("device_id", signupTransaction.deviceIdToken, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: NODE_ENV === "development" ? false : true,
-    });
-    res.cookie("refresh_token", signTokenWithJwt(signupTransaction.refreshToken as string, "7d"), {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: NODE_ENV === "development" ? false : true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    res.redirect(FRONTEND_URL);
+      res.redirect(FRONTEND_URL);
     } catch (error) {
       logger.error("Error in Google Sign-In callback:", error);
-      return res.status(500).send( "<div style='color:red'>Internal Server Error</div>" );
+      return res.status(500).send("<div style='color:red'>Internal Server Error</div>");
     }
   }
 );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // await prismaClient.user.upsert({
-    //   where: { email: data.email },
-    //   update: {
-    //     name: data.name ?? undefined,
-    //     avatar: data.picture ?? undefined,
-    //     emailVerified: true,
-    //   },
-    //   create: {
-    //     email: data.email,
-    //     emailVerified: true,
-    //     provider: Provider.GOOGLE,
-    //     username,
-    //     bio: `Hello i am ${data.name}`,
-    //     name: data.name,
-    //     avatar: data.picture,
-    //   },
-    //   select: {
-    //     ...userSelect,
-    //     Session: true,
-    //   },
-    // });
+// await prismaClient.user.upsert({
+//   where: { email: data.email },
+//   update: {
+//     name: data.name ?? undefined,
+//     avatar: data.picture ?? undefined,
+//     emailVerified: true,
+//   },
+//   create: {
+//     email: data.email,
+//     emailVerified: true,
+//     provider: Provider.GOOGLE,
+//     username,
+//     bio: `Hello i am ${data.name}`,
+//     name: data.name,
+//     avatar: data.picture,
+//   },
+//   select: {
+//     ...userSelect,
+//     Session: true,
+//   },
+// });

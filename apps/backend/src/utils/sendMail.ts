@@ -1,9 +1,12 @@
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from "@getbrevo/brevo";
 import { BREVO_API_KEY } from "./envs.ts";
 
-
-
-export const sendMail =(subject:string, data:string, clientEmail:string,clientName:string ):Promise<unknown> =>{
+export const sendMail = (
+  subject: string,
+  data: string,
+  clientEmail: string,
+  clientName: string
+): Promise<unknown> => {
   const transactionalEmailsApi = new TransactionalEmailsApi();
   transactionalEmailsApi.setApiKey(TransactionalEmailsApiApiKeys.apiKey, BREVO_API_KEY || "");
   return transactionalEmailsApi.sendTransacEmail({
@@ -17,4 +20,4 @@ export const sendMail =(subject:string, data:string, clientEmail:string,clientNa
     textContent: data,
     sender: { email: "no-reply@rupayannandi.top", name: "Team Porilekh" },
   });
-}
+};

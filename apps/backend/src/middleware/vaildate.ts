@@ -54,7 +54,7 @@ export const validate =
       }
       return sendJsonResponse(res, 400, {
         success: false,
-        errors: error instanceof Error? error?.message||error :"Something went wrong",
+        errors: error instanceof Error ? error?.message || error : "Something went wrong",
       });
     }
   };

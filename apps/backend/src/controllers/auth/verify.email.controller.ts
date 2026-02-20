@@ -65,11 +65,13 @@ export const verifyEmailController = asyncHandler(
       if (user.emailVerified) {
         return res.status(400).send("<div style='color:green'>Email already verified</div>");
       }
-      const username=`${String(user.email)
-      .split("@")[0]
-      ?.toLowerCase()
-      }${crypto.randomBytes(6).toString("hex")}`;
-      await updateUser({ id: userId }, { username,emailVerified: true, emailVerifiedAt: new Date() });
+      const username = `${String(user.email)
+        .split("@")[0]
+        ?.toLowerCase()}${crypto.randomBytes(6).toString("hex")}`;
+      await updateUser(
+        { id: userId },
+        { username, emailVerified: true, emailVerifiedAt: new Date() }
+      );
       await sendMail(
         "Email Verified Successfully",
         `<div style="font-family: Arial, sans-serif; color: #333;">

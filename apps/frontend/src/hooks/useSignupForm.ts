@@ -6,16 +6,16 @@ export type SignupDataFields = {
   password: string;
   phone: string;
   bio: string;
-  linkedin: string|undefined;
-  github: string|undefined;
-  website: string|undefined;
-  avatar: File|null;
-  twitter: string|undefined;
-  resume: File|null;
+  linkedin: string | undefined;
+  github: string | undefined;
+  website: string | undefined;
+  avatar: File | null;
+  twitter: string | undefined;
+  resume: File | null;
   pinCode: string;
-  successPin:string;
-  enterManually:boolean;
-  dist:string;
+  successPin: string;
+  enterManually: boolean;
+  dist: string;
   city: string;
   state: string;
   country: string;
@@ -33,15 +33,15 @@ function useSignupForm() {
     github: undefined,
     twitter: undefined,
     website: undefined,
-    avatar:  null,
-    resume:null,
+    avatar: null,
+    resume: null,
     pinCode: "",
-    successPin:"",
-    enterManually:false,
+    successPin: "",
+    enterManually: false,
     city: "",
     state: "",
     country: "",
-    dist:"",
+    dist: "",
   });
   const updateDataFields = (data: Partial<SignupDataFields>) => {
     setDataFields((prev) => ({
@@ -49,14 +49,14 @@ function useSignupForm() {
       ...data,
     }));
   };
-  const backToFirst=()=>setStep(0);
+  const backToFirst = () => setStep(0);
   return {
     step,
     nextStep: () => setStep((prev) => prev + 1),
     prevStep: () => setStep((prev) => prev - 1),
     dataFields,
     updateDataFields,
-    backToFirst
+    backToFirst,
   };
 }
 

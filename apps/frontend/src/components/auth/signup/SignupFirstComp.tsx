@@ -14,14 +14,10 @@ type Props = {
   dataFields: SignupDataFields;
   nextStep: () => void;
 
-  updateDataFields: (element:Partial<SignupDataFields>)=>void;
+  updateDataFields: (element: Partial<SignupDataFields>) => void;
 };
 
-function SignupFirstComp({
-  dataFields,
-  nextStep,
-  updateDataFields,
-}: Props) {
+function SignupFirstComp({ dataFields, nextStep, updateDataFields }: Props) {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useSelector((state: RootState) => state?.theme.value);
   const [emailData, setEmailData] = useState<string>(dataFields.email);
@@ -47,7 +43,7 @@ function SignupFirstComp({
         draggable: true,
         transition: Zoom,
       });
-      return
+      return;
     }
     updateDataFields({ email: emailData, phone: phoneData });
     nextStep();

@@ -10,3 +10,5 @@ userRouter.route("/get-user-details").get(checkTokens, getUserDetailsController)
 userRouter
   .route("/update-user-details")
   .post(validate(updateUserZodSchema), checkTokens, updateUserDetailsController);
+
+export default userRouter;

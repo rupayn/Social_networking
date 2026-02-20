@@ -1,6 +1,10 @@
 import { Router } from "express";
 import { signinController } from "@/controllers/auth/signin.controller.ts";
-import { forgotPasswordSendLink, resetPasswordController, validateResetPasswordToken } from "@/controllers/auth/forgot.controller.ts";
+import {
+  forgotPasswordSendLink,
+  resetPasswordController,
+  validateResetPasswordToken,
+} from "@/controllers/auth/forgot.controller.ts";
 import {
   signUpWithGoogleController,
   signWithGoogleControllerCallback,
@@ -16,7 +20,10 @@ import {
 import { signUpController } from "@/controllers/auth/signup.controller.ts";
 import { signoutController } from "@/controllers/auth/signout.controller.ts";
 import { checkTokens } from "@/middleware/checkRefreshToken.ts";
-import { sendVerifyEmailLinkController, verifyEmailController } from "@/controllers/auth/verify.email.controller.ts";
+import {
+  sendVerifyEmailLinkController,
+  verifyEmailController,
+} from "@/controllers/auth/verify.email.controller.ts";
 import { singleUploadDpAndCv } from "@/middleware/multer.ts";
 
 const authRouter = Router();
@@ -27,7 +34,7 @@ const authRouter = Router();
  ****************************************************************************************************
  ****************************************************************************************************
  */
-authRouter.route("/signup").post(singleUploadDpAndCv,validate(signUpZodSchema), signUpController);
+authRouter.route("/signup").post(singleUploadDpAndCv, validate(signUpZodSchema), signUpController);
 authRouter.route("/signin").post(validate(signInZodSchema), signinController);
 
 /**
@@ -57,15 +64,15 @@ authRouter.route("/forgot").post(validate(ForgotPasswordZodSchema), forgotPasswo
 
 authRouter.route("/signout").post(checkTokens, signoutController);
 
-export default authRouter;
-
-
-
 //  email verification route
-authRouter.route("/send-verify-email-link").post(checkTokens,sendVerifyEmailLinkController);
+authRouter.route("/send-verify-email-link").post(checkTokens, sendVerifyEmailLinkController);
 authRouter.route("/verify-email").get(verifyEmailController);
 
 // Forgot password routes
-authRouter.route("/forgot-password-send-link").post(validate(forgotPasswordSendLinkZodSchema),forgotPasswordSendLink)
+authRouter
+  .route("/forgot-password-send-link")
+  .post(validate(forgotPasswordSendLinkZodSchema), forgotPasswordSendLink);
 authRouter.route("/validate-reset-password-token").get(validateResetPasswordToken);
 authRouter.route("/reset-password").post(resetPasswordController);
+
+export default authRouter;

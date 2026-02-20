@@ -6,7 +6,6 @@ function SignWithGoogle({ className }: { className?: string }) {
   const [isHovered, setIsHovered] = React.useState(false);
   const handelLogin = () => {
     window.location.href = `${API_BASE}/auth/sign/google`;
-    
   };
   return (
     <div

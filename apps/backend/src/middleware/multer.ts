@@ -1,15 +1,15 @@
 import multer from "multer";
 
-const storage=multer.diskStorage({
-  destination:(_req,_file,cb)=>{
-    cb(null,"./public/temp")
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => {
+    cb(null, "./public/temp");
   },
   filename: function (_req, file, cb) {
     const unique = crypto.randomUUID();
-      
-      cb(null, `${unique}-${file.originalname}`)
-  }
-})
+
+    cb(null, `${unique}-${file.originalname}`);
+  },
+});
 // const storage=multer.memoryStorage()
 export const multerUploadSingle = multer({
   storage,
@@ -28,7 +28,7 @@ export interface MulterFileType {
 }
 
 export const singleAvatar = multerUploadSingle.single("avatar");
-export const singleUploadDpAndCv= multerUploadSingle.fields([
+export const singleUploadDpAndCv = multerUploadSingle.fields([
   { name: "avatar", maxCount: 1 },
   { name: "resume", maxCount: 1 },
 ]);

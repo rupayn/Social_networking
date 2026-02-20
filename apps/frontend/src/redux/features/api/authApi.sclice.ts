@@ -112,8 +112,6 @@ interface Profile {
   updatedAt: string;
 }
 
-
-
 interface user {
   id: string;
   email: string;
@@ -139,13 +137,11 @@ interface user {
   profile: Profile;
 }
 
-
-interface SignResponse {
+export interface SignResponse {
   success: boolean;
   message: string;
   user: user;
 }
-
 
 interface ForgotPasswordRequest {
   email: string;
@@ -166,10 +162,6 @@ interface ResetPasswordResponse {
   message: string;
 }
 
-
-
-
-
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
@@ -179,13 +171,12 @@ export const authApi = createApi({
 
   endpoints: (builder) => ({
     signUp: builder.mutation<SignResponse, FormData>({
-      
       query: (body) => ({
         url: "/signup",
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Auth"]
+      invalidatesTags: ["Auth"],
     }),
 
     signIn: builder.mutation<SignResponse, SignInRequest>({
@@ -217,4 +208,9 @@ export const authApi = createApi({
   }),
 });
 
-export const { useSignInMutation, useForgotPasswordMutation, useResetPasswordMutation,useSignUpMutation } = authApi;
+export const {
+  useSignInMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+  useSignUpMutation,
+} = authApi;

@@ -15,7 +15,7 @@ type Props = {
   prevStep: () => void;
   updateDataFields: (element: Partial<SignupDataFields>) => void;
 };
-// 
+//
 // SignupFourthComp
 function SignupSecondComp({ dataFields, nextStep, prevStep, updateDataFields }: Props) {
   const dispatch = useDispatch<AppDispatch>();
@@ -129,13 +129,13 @@ function SignupSecondComp({ dataFields, nextStep, prevStep, updateDataFields }: 
             className="w-full bg-gray-700 text-gray-100 border border-gray-600 rounded-full px-5 py-2.5 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
           />
           <button
-          type="button"
-          onClick={() => setShowReEnterPassword((prev) => !prev)}
-          className="absolute inset-y-0 right-4 flex items-center text-xl text-gray-400 hover:text-gray-200"
-        >
-          {showReEnterPassword ? <PiEyeFill /> : <PiEyeClosedFill />}
-        </button>
-        </div>    
+            type="button"
+            onClick={() => setShowReEnterPassword((prev) => !prev)}
+            className="absolute inset-y-0 right-4 flex items-center text-xl text-gray-400 hover:text-gray-200"
+          >
+            {showReEnterPassword ? <PiEyeFill /> : <PiEyeClosedFill />}
+          </button>
+        </div>
       </div>
       {/* Bio */}
       <div className="flex flex-col gap-1">
@@ -172,4 +172,3 @@ function SignupSecondComp({ dataFields, nextStep, prevStep, updateDataFields }: 
 }
 
 export default SignupSecondComp;
-

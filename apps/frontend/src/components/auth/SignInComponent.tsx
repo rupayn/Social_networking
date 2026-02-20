@@ -47,7 +47,7 @@ function SignInComponent() {
           draggable: true,
           transition: Zoom,
         });
-        
+
         dispatch(setAuthValues(response.user));
         navigate("/");
       }

@@ -2,9 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import type { SignupDataFields } from "../../../hooks/useSignupForm";
 import UploadFile from "../../UploadFile";
 
-import type { RootState } from "../../../redux/store";
-import { useSelector } from "react-redux";
-
 import { FaTrashAlt } from "react-icons/fa";
 
 type Props = {
@@ -20,7 +17,9 @@ function SignupThirdComp({ dataFields, prevStep, updateDataFields, nextStep }: P
   const [preview, setPreview] = useState<string | null>(
     dataFields.avatar ? URL.createObjectURL(dataFields.avatar) : null
   );
-  const [pdfPreview, setPdfPreview] = useState<string | null>(dataFields.resume ? URL.createObjectURL(dataFields.resume) : null);
+  const [pdfPreview, setPdfPreview] = useState<string | null>(
+    dataFields.resume ? URL.createObjectURL(dataFields.resume) : null
+  );
   const pdfContainerRef = useRef<HTMLDivElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -30,9 +29,9 @@ function SignupThirdComp({ dataFields, prevStep, updateDataFields, nextStep }: P
   const removeImage = () => {
     setFileImg([]);
     setPreview(null);
-    
+
     updateDataFields({ avatar: null });
-    if(!dataFields.resume){
+    if (!dataFields.resume) {
       setUploaded(false);
     }
   };
@@ -41,9 +40,9 @@ function SignupThirdComp({ dataFields, prevStep, updateDataFields, nextStep }: P
     setFilePdf([]);
     setPdfPreview(null);
     updateDataFields({ resume: null });
-  if(!dataFields.avatar){
-    setUploaded(false);
-  }
+    if (!dataFields.avatar) {
+      setUploaded(false);
+    }
   };
 
   const enterFullscreen = () => {
@@ -58,16 +57,14 @@ function SignupThirdComp({ dataFields, prevStep, updateDataFields, nextStep }: P
     }
   };
 
-  const theme = useSelector((state: RootState) => state?.theme.value);
   const handelUpload = async function () {
     nextStep();
-    
   };
-  useEffect(()=>{
-    if(dataFields.avatar||dataFields.resume){
+  useEffect(() => {
+    if (dataFields.avatar || dataFields.resume) {
       setUploaded(true);
     }
-  },[])
+  }, []);
   useEffect(() => {
     if (!fileImg[0]) return;
     updateDataFields({ avatar: fileImg[0] });
@@ -86,7 +83,6 @@ function SignupThirdComp({ dataFields, prevStep, updateDataFields, nextStep }: P
   }, [filePdf]);
 
   useEffect(() => {
-    if(dataFields.avatar){}
     const handleChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
@@ -167,7 +163,7 @@ function SignupThirdComp({ dataFields, prevStep, updateDataFields, nextStep }: P
             accept="image/png, image/jpeg"
           />
 
-          {preview === null  && (
+          {preview === null && (
             <span className="text-xs text-gray-950 dark:text-gray-400">
               Click to select Image (PNG / JPG)
             </span>
@@ -193,7 +189,7 @@ function SignupThirdComp({ dataFields, prevStep, updateDataFields, nextStep }: P
             </button>
 
             <iframe
-              src={pdfPreview?`${pdfPreview}#zoom=70`:undefined}
+              src={pdfPreview ? `${pdfPreview}#zoom=70` : undefined}
               title="PDF Preview"
               className={`w-full ${
                 isFullscreen ? "h-screen" : preview ? "h-24" : "h-24"
@@ -222,13 +218,13 @@ function SignupThirdComp({ dataFields, prevStep, updateDataFields, nextStep }: P
             overflow-hidden text-center wrap-break-word
   
             ${
-              pdfPreview !==null
+              pdfPreview !== null
                 ? "py-2 border-purple-500 bg-purple-500/10"
                 : "py-5 border-indigo-500 bg-indigo-500/10 hover:bg-indigo-500/20"
             }
   
             ${
-              pdfPreview !==null
+              pdfPreview !== null
                 ? "dark:border-purple-400 dark:bg-purple-400/10"
                 : "dark:border-indigo-400 dark:bg-indigo-400/10 dark:hover:bg-indigo-400/20"
             }
@@ -243,7 +239,7 @@ function SignupThirdComp({ dataFields, prevStep, updateDataFields, nextStep }: P
             ref={cvRef}
           />
 
-          {pdfPreview===null && (
+          {pdfPreview === null && (
             <span className="text-xs text-gray-950 dark:text-gray-400">Click to select PDF</span>
           )}
         </div>

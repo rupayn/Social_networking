@@ -77,7 +77,6 @@ function ForgetPasswordComponent() {
           transition: Zoom,
         });
       }
-      
     } catch (error: unknown) {
       let errorMessage = "Something went wrong";
 
@@ -95,7 +94,6 @@ function ForgetPasswordComponent() {
         draggable: true,
         transition: Zoom,
       });
-      
     }
   };
   return (

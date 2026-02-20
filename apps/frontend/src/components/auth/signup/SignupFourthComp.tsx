@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../../redux/store";
 import { setTheme } from "../../../redux/features/theme.slice";
 import { FaLightbulb, FaMoon } from "react-icons/fa6";
-import { useState , useEffect } from "react";
+import { useState, useEffect } from "react";
 import type { SignupDataFields } from "../../../hooks/useSignupForm";
 
 import {
@@ -12,21 +12,19 @@ import {
 import { toast, Zoom } from "react-toastify";
 import { signUpZodSchema } from "@repo/zod-schemas/config";
 
-
 type Props = {
   dataFields: SignupDataFields;
   nextStep: () => void;
   prevStep: () => void;
   updateDataFields: (element: Partial<SignupDataFields>) => void;
 };
-// 
+//
 function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: Props) {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useSelector((state: RootState) => state.theme.value);
 
   const [pin, setPin] = useState(dataFields.successPin || "");
   const [manualEntry, setManualEntry] = useState(dataFields.enterManually || false);
-
 
   // RTK QUERY
   const {
@@ -48,17 +46,16 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
       dist: po.district,
       state: po.statename,
       country: "India",
-      
     });
-    if(pin.length === 6){
-      updateDataFields({successPin:pin});
+    if (pin.length === 6) {
+      updateDataFields({ successPin: pin });
     }
   }, [offices, manualEntry]);
   const handlePinChange = (value: string) => {
     updateDataFields({ pinCode: value });
     setPin(value);
     setManualEntry(false);
-    updateDataFields({enterManually:false});
+    updateDataFields({ enterManually: false });
   };
 
   const handleSelectPostOffice = (name: string) => {
@@ -73,8 +70,8 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
     });
   };
 
-  const handelNext=()=>{
-    if(pin.length !== 6){
+  const handelNext = () => {
+    if (pin.length !== 6) {
       toast.error(`PIN code must be 6 digits`, {
         theme: theme === "dark" ? "light" : "dark",
         position: "top-center",
@@ -84,15 +81,16 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
       });
       return;
     }
-    const res=signUpZodSchema.pick({ pinCode: true, city: true, dist: true, state: true, country: true })
-    .safeParse({
-      pinCode: dataFields.pinCode,
-      city: dataFields.city,
-      dist: dataFields.dist,
-      state: dataFields.state,
-      country: dataFields.country,
-    });
-    if(!res.success){
+    const res = signUpZodSchema
+      .pick({ pinCode: true, city: true, dist: true, state: true, country: true })
+      .safeParse({
+        pinCode: dataFields.pinCode,
+        city: dataFields.city,
+        dist: dataFields.dist,
+        state: dataFields.state,
+        country: dataFields.country,
+      });
+    if (!res.success) {
       toast.error(`${JSON.parse(res.error.message)[0].message}`, {
         theme: theme === "dark" ? "light" : "dark",
         position: "top-center",
@@ -104,24 +102,27 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
     }
 
     nextStep();
-  }
+  };
   useEffect(() => {
     if (isError) {
-      toast.error("You can enter your address manually or just enter your PIN code and select from the results.", {
-        theme: theme === "dark" ? "light" : "dark",
-        position: "top-center",
-        closeOnClick: true,
-        draggable: true,
-        transition: Zoom,
-      });
-      if(dataFields.successPin!==pin){
-        updateDataFields({pinCode:dataFields.successPin});
-        setPin(dataFields.successPin);  
+      toast.error(
+        "You can enter your address manually or just enter your PIN code and select from the results.",
+        {
+          theme: theme === "dark" ? "light" : "dark",
+          position: "top-center",
+          closeOnClick: true,
+          draggable: true,
+          transition: Zoom,
+        }
+      );
+      if (dataFields.successPin !== pin) {
+        updateDataFields({ pinCode: dataFields.successPin });
+        setPin(dataFields.successPin);
       }
     }
   }, [isError]);
-  useEffect(()=>{
-    if(isFetching){
+  useEffect(() => {
+    if (isFetching) {
       toast.info(`Fetching address details... please wait `, {
         theme: theme === "dark" ? "light" : "dark",
         position: "top-center",
@@ -130,7 +131,7 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
         transition: Zoom,
       });
     }
-  },[isFetching])
+  }, [isFetching]);
   return (
     <div className="relative w-full max-w-md mx-auto px-6 py-2 flex flex-col gap-5">
       {/* THEME TOGGLE */}
@@ -143,7 +144,8 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
 
       {/* PIN CODE */}
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-black dark:text-white">Pin Code 
+        <label className="text-sm font-medium text-black dark:text-white">
+          Pin Code
           <span className="text-red-500 font-extrabold"> *</span>
         </label>
         <input
@@ -154,7 +156,11 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
           className="w-full bg-gray-700 text-gray-100 border rounded-full px-5 py-2.5"
         />
 
-        {isFetching && <span className="text-xs font-extrabold dark:font-normal text-blue-900 dark:text-blue-400">Loading address…</span>}
+        {isFetching && (
+          <span className="text-xs font-extrabold dark:font-normal text-blue-900 dark:text-blue-400">
+            Loading address…
+          </span>
+        )}
 
         {isError && <span className="text-xs text-red-400">PIN not found. Enter manually.</span>}
       </div>
@@ -168,7 +174,7 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
           onChange={(e) => {
             updateDataFields({ city: e.target.value });
             setManualEntry(true);
-            updateDataFields({enterManually:true});
+            updateDataFields({ enterManually: true });
           }}
           className="w-full bg-gray-700 text-gray-100 border rounded-full px-5 py-2.5"
         />
@@ -192,8 +198,8 @@ function SignupFourthComp({ dataFields, nextStep, prevStep, updateDataFields }: 
           <button
             type="button"
             onClick={() => {
-              updateDataFields({enterManually:true});
-              setManualEntry(true)
+              updateDataFields({ enterManually: true });
+              setManualEntry(true);
             }}
             className="text-xs underline text-blue-500 self-start"
           >

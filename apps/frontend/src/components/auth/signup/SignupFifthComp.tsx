@@ -95,7 +95,6 @@ function SignupFifthComp({ dataFields, prevStep, updateDataFields }: Props) {
         }
       }
       if (!res.success) {
-        
         toast.error("Please check inputs or try again", {
           theme: theme === "dark" ? "light" : "dark",
           position: "top-center",
@@ -113,8 +112,7 @@ function SignupFifthComp({ dataFields, prevStep, updateDataFields }: Props) {
           draggable: true,
           transition: Zoom,
         });
-      }
-      else {
+      } else {
         toast.error("Something went wrong", {
           theme: theme === "dark" ? "light" : "dark",
           position: "top-center",

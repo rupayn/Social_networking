@@ -44,8 +44,8 @@ const setCache = async (key: string, data: unknown, ttl = 300): Promise<void> =>
   await redisClient.set(key, JSON.stringify(data), { EX: ttl });
 };
 
-const clearCache=async(key:string):Promise<void>=>{
+const clearCache = async (key: string): Promise<void> => {
   await redisClient.del(key);
-}
+};
 
-export { redisClient, setCache, getCache,clearCache };
+export { redisClient, setCache, getCache, clearCache };

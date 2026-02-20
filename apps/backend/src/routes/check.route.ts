@@ -31,34 +31,32 @@ check.route("/upload").post(
       let pdf;
       if (avatar) {
         console.log(avatar);
-        result=await uploadToCloudinary(avatar.path, {
-            folder: "profile",
-            resource_type: "image",
-            public_id: avatar.filename,
-          })
-        
+        result = await uploadToCloudinary(avatar.path, {
+          folder: "profile",
+          resource_type: "image",
+          public_id: avatar.filename,
+        });
       }
-      
-      if(resume){
-        pdf=await uploadToCloudinary(resume.path, {
+
+      if (resume) {
+        pdf = await uploadToCloudinary(resume.path, {
           folder: "resume",
-          resource_type:"auto",
+          resource_type: "auto",
           public_id: resume.filename,
-        })
+        });
       }
 
       res.status(200).json({
         message: "success",
         result,
-        pdf
+        pdf,
       });
-
     } catch (error) {
       logger.error("Error in uploadToCloudinary check route : \n", error);
-      if(avatar){
+      if (avatar) {
         await fs.unlink(avatar.path).catch(() => {});
       }
-      if(resume){
+      if (resume) {
         await fs.unlink(resume.path).catch(() => {});
       }
       res.status(500).json({ message: "Internal server error" });

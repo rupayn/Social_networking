@@ -51,15 +51,15 @@ function ResetPasswordComponent() {
           transition: Zoom,
         });
       }
-      if(!response?.success)toast.error(response?.message, {
-        theme: theme === "dark" ? "light" : "dark",
-        position: "top-center",
-        closeOnClick: true,
-        draggable: true,
-        transition: Zoom,
-      })
-      if(response?.success)navigate("/signin");
-      
+      if (!response?.success)
+        toast.error(response?.message, {
+          theme: theme === "dark" ? "light" : "dark",
+          position: "top-center",
+          closeOnClick: true,
+          draggable: true,
+          transition: Zoom,
+        });
+      if (response?.success) navigate("/signin");
     } catch (error) {
       let errorMessage = "Something went wrong";
 
@@ -70,7 +70,7 @@ function ResetPasswordComponent() {
 
         errorMessage = err.data?.message || errorMessage;
       }
-      
+
       toast.error(`${errorMessage}`, {
         theme: theme === "dark" ? "light" : "dark",
         position: "top-center",
@@ -193,7 +193,7 @@ function ResetPasswordComponent() {
             transition
           "
         >
-          {isLoading?"Resetting...":"Reset Password"}
+          {isLoading ? "Resetting..." : "Reset Password"}
         </button>
       </form>
     </div>

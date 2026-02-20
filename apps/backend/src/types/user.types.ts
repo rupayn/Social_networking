@@ -17,10 +17,10 @@ export const sessionSelect = {
 } satisfies Prisma.SessionSelect;
 
 /*
-* Base Profile
-*/
+ * Base Profile
+ */
 
-export const ProfileSelect={
+export const ProfileSelect = {
   id: true,
   userId: true,
   resume: true,
@@ -44,7 +44,7 @@ export const ProfileSelect={
   educations: true,
   experiences: true,
   skills: true,
-} 
+};
 
 /**
  * Base user selection (without password)

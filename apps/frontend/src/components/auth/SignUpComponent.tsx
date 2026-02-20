@@ -6,7 +6,7 @@ import SignupSecondComp from "./signup/SignupSecondComp";
 import SignupFifthComp from "./signup/SignupFifthComp";
 
 function SignUpComponent() {
-  const { step, dataFields, nextStep, prevStep, updateDataFields,backToFirst } = useSignupForm();
+  const { step, dataFields, nextStep, prevStep, updateDataFields, backToFirst } = useSignupForm();
 
   const renderStep = () => {
     switch (step) {
@@ -19,13 +19,40 @@ function SignUpComponent() {
           />
         );
       case 1:
-        return <SignupSecondComp dataFields={dataFields} nextStep={nextStep} prevStep={prevStep} updateDataFields={updateDataFields}/>;
+        return (
+          <SignupSecondComp
+            dataFields={dataFields}
+            nextStep={nextStep}
+            prevStep={prevStep}
+            updateDataFields={updateDataFields}
+          />
+        );
       case 2:
-        return <SignupThirdComp dataFields={dataFields} nextStep={nextStep} prevStep={prevStep} updateDataFields={updateDataFields} />
+        return (
+          <SignupThirdComp
+            dataFields={dataFields}
+            nextStep={nextStep}
+            prevStep={prevStep}
+            updateDataFields={updateDataFields}
+          />
+        );
       case 3:
-        return <SignupFourthComp dataFields={dataFields} prevStep={prevStep} updateDataFields={updateDataFields} nextStep={nextStep}/>
+        return (
+          <SignupFourthComp
+            dataFields={dataFields}
+            prevStep={prevStep}
+            updateDataFields={updateDataFields}
+            nextStep={nextStep}
+          />
+        );
       case 4:
-        return <SignupFifthComp dataFields={dataFields} prevStep={prevStep} updateDataFields={updateDataFields}/>
+        return (
+          <SignupFifthComp
+            dataFields={dataFields}
+            prevStep={prevStep}
+            updateDataFields={updateDataFields}
+          />
+        );
       default:
         backToFirst();
     }

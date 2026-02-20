@@ -179,7 +179,7 @@ export type SignupDataFieldsCommonSignUp = Omit<
 export const commonSignUp = async function (
   _res: express.Response,
   tx: Prisma.TransactionClient,
-  data: SignupDataFieldsCommonSignUp,
+  data: SignupDataFieldsCommonSignUp
 ) {
   try {
     const existingUser = await tx.user.findUnique({
@@ -193,7 +193,7 @@ export const commonSignUp = async function (
         user: existingUser.provider === Provider.MANUAL ? null : existingUser,
       };
     }
-    
+
     const user = await tx.user.create({
       data,
       select: userWithSessionsSelect,

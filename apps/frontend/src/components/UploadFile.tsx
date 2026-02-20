@@ -1,4 +1,4 @@
-import  { forwardRef, useRef } from "react";
+import { forwardRef, useRef } from "react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 
 type UploadFileProps = {

@@ -26,7 +26,12 @@ import express from "express";
 import { asyncHandler, sendJsonResponse } from "@/utils/handler.ts";
 import { sendMail } from "@/utils/sendMail.ts";
 import { logger } from "@repo/logger/config";
-import { decodeTokenWithJwt, generateHashToken, signTokenWithJwt, verifyHashedToken } from "@/utils/oauth.ts";
+import {
+  decodeTokenWithJwt,
+  generateHashToken,
+  signTokenWithJwt,
+  verifyHashedToken,
+} from "@/utils/oauth.ts";
 import { generateActionEmailTemplate } from "@/utils/actionTempletHtml.ts";
 import { clearCache, getCache, setCache } from "@/utils/redisClient.ts";
 import { getUserByEmail, getUserByIdWithPassword } from "@/services/user.ts";
@@ -65,9 +70,9 @@ export const forgotPasswordSendLink = asyncHandler(async function (
 
     const token = signTokenWithJwt(user.id, "15m");
     const code = crypto.randomUUID();
-    await clearCache(RESET_PASSWORD_CODE_KEY(user.id))
-    await setCache(RESET_PASSWORD_CODE_KEY(user.id),`${code}`,15 * 60)
-    
+    await clearCache(RESET_PASSWORD_CODE_KEY(user.id));
+    await setCache(RESET_PASSWORD_CODE_KEY(user.id), `${code}`, 15 * 60);
+
     const params = new URLSearchParams({
       token,
       code,
@@ -85,7 +90,7 @@ export const forgotPasswordSendLink = asyncHandler(async function (
       footerNote:
         "This link will remain valid for 15 minutes. <span  style='font-weight: 600;color:`red`'>If you did not request a password reset, please ignore this email.</span>",
     });
-    await sendMail("Password Reset", htmlContent, email,user.name as string);
+    await sendMail("Password Reset", htmlContent, email, user.name as string);
     return sendJsonResponse(res, 200, {
       success: true,
       message: "Password reset link sent to your email",
@@ -118,68 +123,59 @@ export const validateResetPasswordToken = asyncHandler(async function (
   res: express.Response
 ) {
   try {
-    const token =
-  typeof req.query.token === "string"
-    ? req.query.token
-    : "";
+    const token = typeof req.query.token === "string" ? req.query.token : "";
 
-const code =
-  typeof req.query.code === "string"
-    ? req.query.code
-    : "";
-  const zodResult = validateResetPasswordTokenZodSchema.safeParse({
-    token,
-    code,
-  });
-  
-  if (!zodResult.success)
-    return res
-      .status(401)
-      .type("html")
-      .send("<div >Invalid token or code or token is expired</div>");
-  
-  if (!token || !code)
-    return res
-      .status(401)
-      .type("html")
-      .send("<div >Invalid token or code or token is expired</div>");
-  const userId = decodeTokenWithJwt(token).sub as string;
-  if (!userId)
-    return res
-      .status(401)
-      .type("html")
-      .send("<div>Invalid token or code or token is expired</div>");
-    
-  const storedCode = await getCache(RESET_PASSWORD_CODE_KEY(userId));
-  if (!storedCode)
-    return res
-      .status(401)
-      .type("html")
-      .send("<div style='color:red'>Invalid token or code or token is expired</div>");
-  if (storedCode !== code) {
-    return res
-      .status(401)
-      .type("html")
-      .send("<div>Invalid token or code or token is expired</div>");
-  }
-  await clearCache(RESET_PASSWORD_CODE_KEY(userId));
-  const reftoken = signTokenWithJwt(userId, "15m");
-  const accessCode = crypto.randomUUID();
-  const shortSession = {
-    id: userId,
-    refreshToken: reftoken,
-    createdAt: Date.now(),
-    code: accessCode,
-  };
-  await setCache(SHORT_SESSION_KEY(accessCode), JSON.stringify(shortSession),15*60);
+    const code = typeof req.query.code === "string" ? req.query.code : "";
+    const zodResult = validateResetPasswordTokenZodSchema.safeParse({
+      token,
+      code,
+    });
 
-  return res.redirect(`${FRONTEND_URL}/submit-new-password?token=${accessCode}`);
+    if (!zodResult.success)
+      return res
+        .status(401)
+        .type("html")
+        .send("<div >Invalid token or code or token is expired</div>");
+
+    if (!token || !code)
+      return res
+        .status(401)
+        .type("html")
+        .send("<div >Invalid token or code or token is expired</div>");
+    const userId = decodeTokenWithJwt(token).sub as string;
+    if (!userId)
+      return res
+        .status(401)
+        .type("html")
+        .send("<div>Invalid token or code or token is expired</div>");
+
+    const storedCode = await getCache(RESET_PASSWORD_CODE_KEY(userId));
+    if (!storedCode)
+      return res
+        .status(401)
+        .type("html")
+        .send("<div style='color:red'>Invalid token or code or token is expired</div>");
+    if (storedCode !== code) {
+      return res
+        .status(401)
+        .type("html")
+        .send("<div>Invalid token or code or token is expired</div>");
+    }
+    await clearCache(RESET_PASSWORD_CODE_KEY(userId));
+    const reftoken = signTokenWithJwt(userId, "15m");
+    const accessCode = crypto.randomUUID();
+    const shortSession = {
+      id: userId,
+      refreshToken: reftoken,
+      createdAt: Date.now(),
+      code: accessCode,
+    };
+    await setCache(SHORT_SESSION_KEY(accessCode), JSON.stringify(shortSession), 15 * 60);
+
+    return res.redirect(`${FRONTEND_URL}/submit-new-password?token=${accessCode}`);
   } catch (error) {
     logger.error("Error in validateResetPasswordToken controller: \n", error);
-    return res
-      .status(500)
-      .type("html")
-      .send("<div style='color:red'>Internal server error</div>");
+    return res.status(500).type("html").send("<div style='color:red'>Internal server error</div>");
   }
 });
 
@@ -204,30 +200,29 @@ export const resetPasswordController = asyncHandler(async function (
   req: express.Request,
   res: express.Response
 ) {
- try {
-   const {password, token} = req.body;
-  const session = await getCache<string>(SHORT_SESSION_KEY(token));
-  if (!session){
-    return sendJsonResponse(res, 401, { success: false, message: "Invalid token" });
-  }
-  
-  const {id} = JSON.parse(session);
-  const user = await getUserByIdWithPassword(id);
-  if (!user) {
-    return sendJsonResponse(res, 404, { success: false, message: "Invalid Request" });
-  }
-  ;
-  const checkPassword= await verifyHashedToken(password,user.password as string);
-  if(checkPassword){
-    return sendJsonResponse(res, 400, { success: false, message: "Password already exists" });
-  }
-  await  clearCache(SHORT_SESSION_KEY(token));
-  const passwordHash=await generateHashToken(password);
-  await updateUser({id:user.id},{password:passwordHash});
-  
-  return sendJsonResponse(res, 200, { success: true, message: "Password reset successfully" });
- } catch (error) {
+  try {
+    const { password, token } = req.body;
+    const session = await getCache<string>(SHORT_SESSION_KEY(token));
+    if (!session) {
+      return sendJsonResponse(res, 401, { success: false, message: "Invalid token" });
+    }
+
+    const { id } = JSON.parse(session);
+    const user = await getUserByIdWithPassword(id);
+    if (!user) {
+      return sendJsonResponse(res, 404, { success: false, message: "Invalid Request" });
+    }
+    const checkPassword = await verifyHashedToken(password, user.password as string);
+    if (checkPassword) {
+      return sendJsonResponse(res, 400, { success: false, message: "Password already exists" });
+    }
+    await clearCache(SHORT_SESSION_KEY(token));
+    const passwordHash = await generateHashToken(password);
+    await updateUser({ id: user.id }, { password: passwordHash });
+
+    return sendJsonResponse(res, 200, { success: true, message: "Password reset successfully" });
+  } catch (error) {
     logger.error("Error in resetPasswordController controller: \n", error);
     return sendJsonResponse(res, 500, { success: false, message: "Internal server error" });
- }
+  }
 });

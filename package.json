@@ -29,8 +29,6 @@
     "packages/*"
   ],
   "dependencies": {
-    "@types/streamifier": "^0.1.2",
-    "jsonwebtoken": "^9.0.3",
-    "streamifier": "^0.1.1"
+    "jsonwebtoken": "^9.0.3"
   }
 }
