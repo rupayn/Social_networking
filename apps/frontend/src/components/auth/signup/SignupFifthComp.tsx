@@ -5,7 +5,7 @@ import { toast, Zoom } from "react-toastify";
 import type { AppDispatch, RootState } from "../../../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { useSignUpMutation } from "../../../redux/features/api/authApi.sclice";
-import { setAuthValues } from "../../../redux/features/auth.slice";
+import { setLogin } from "../../../redux/features/auth.slice";
 import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../../common/loading";
 
@@ -33,7 +33,7 @@ function SignupFifthComp({ dataFields, prevStep, updateDataFields }: Props) {
   const [website, setWebsite] = useState(dataFields.website || "");
 
   const theme = useSelector((state: RootState) => state.theme.value);
-  const [signup, { isLoading, isError }] = useSignUpMutation();
+  const [signup, { error,isLoading, isError }] = useSignUpMutation();
 
   const handelSignUp = async function () {
     updateDataFields({ github, linkedin, twitter, website });
@@ -65,7 +65,6 @@ function SignupFifthComp({ dataFields, prevStep, updateDataFields }: Props) {
       const value = cleanedData[key];
 
       if (value !== null && value !== undefined) {
-        if (key === "email") continue;
         formData.append(key, String(value));
       }
     }
@@ -90,7 +89,7 @@ function SignupFifthComp({ dataFields, prevStep, updateDataFields }: Props) {
             transition: Zoom,
           });
 
-          dispatch(setAuthValues(res.user));
+          dispatch(setLogin(res.user));
           navigate("/");
         }
       }
@@ -113,7 +112,7 @@ function SignupFifthComp({ dataFields, prevStep, updateDataFields }: Props) {
           transition: Zoom,
         });
       } else {
-        toast.error("Something went wrong", {
+        toast.error(error?.message||"Something went wrong", {
           theme: theme === "dark" ? "light" : "dark",
           position: "top-center",
           closeOnClick: true,

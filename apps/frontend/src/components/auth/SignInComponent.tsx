@@ -10,7 +10,7 @@ import { useState } from "react";
 import { toast, Zoom } from "react-toastify";
 import { signInZodSchema } from "@repo/zod-schemas/config";
 import { useSignInMutation } from "../../redux/features/api/authApi.sclice";
-import { setAuthValues } from "../../redux/features/auth.slice";
+import { setLogin } from "../../redux/features/auth.slice";
 
 function SignInComponent() {
   const dispatch = useDispatch<AppDispatch>();
@@ -48,7 +48,7 @@ function SignInComponent() {
           transition: Zoom,
         });
 
-        dispatch(setAuthValues(response.user));
+        dispatch(setLogin(response.user));
         navigate("/");
       }
     } catch (error) {

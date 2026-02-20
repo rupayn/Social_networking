@@ -45,6 +45,7 @@ interface Profile {
 }
 
 export interface AuthStateInterFace {
+  isAuthenticated:boolean,
   value: {
     id: string;
     email: string;
@@ -72,6 +73,7 @@ export interface AuthStateInterFace {
 }
 
 const initialState: AuthStateInterFace = {
+  isAuthenticated: false,
   value: {
     id: "",
     email: "",
@@ -132,12 +134,13 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     /**
-     * setAuthValues action - updates user profile fields
+     * setLogin action - updates user profile fields
      * Merges provided payload with existing state, allowing partial updates
      * @param state - Current state
      * @param action - Contains payload with user fields to update
      */
-    setAuthValues: (state, action) => {
+    setLogin: (state, action) => {
+      state.isAuthenticated = true;
       state.value = {
         ...state.value,
         ...action.payload,
@@ -150,6 +153,7 @@ export const authSlice = createSlice({
      * @param state - Current state
      */
     setLogout: (state) => {
+      state.isAuthenticated = false;
       state.value = {
         ...initialState.value,
       };
@@ -158,7 +162,7 @@ export const authSlice = createSlice({
 });
 
 // Export action creators
-export const { setAuthValues, setLogout } = authSlice.actions;
+export const { setLogin, setLogout } = authSlice.actions;
 
 // Export reducer as default - used to configure the Redux store
 export default authSlice.reducer;

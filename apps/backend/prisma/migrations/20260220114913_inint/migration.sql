@@ -22,6 +22,9 @@ CREATE TYPE "Mode" AS ENUM ('light', 'dark');
 -- CreateEnum
 CREATE TYPE "Layout" AS ENUM ('default');
 
+-- CreateEnum
+CREATE TYPE "ProjectType" AS ENUM ('PERSONAL', 'ACADEMIC', 'PROFESSIONAL');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -78,6 +81,25 @@ CREATE TABLE "Profile" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Profile_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Projects" (
+    "id" TEXT NOT NULL,
+    "profileId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "liveLink" TEXT,
+    "githubLink" TEXT,
+    "technologies" TEXT,
+    "startDate" TIMESTAMP(3),
+    "endDate" TIMESTAMP(3),
+    "projectType" "ProjectType" NOT NULL,
+    "myContribution" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Projects_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -180,6 +202,9 @@ CREATE INDEX "Session_userId_idx" ON "Session"("userId");
 CREATE UNIQUE INDEX "Profile_userId_key" ON "Profile"("userId");
 
 -- CreateIndex
+CREATE INDEX "Projects_profileId_idx" ON "Projects"("profileId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Address_permanentUserId_key" ON "Address"("permanentUserId");
 
 -- CreateIndex
@@ -205,6 +230,9 @@ ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId"
 
 -- AddForeignKey
 ALTER TABLE "Profile" ADD CONSTRAINT "Profile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Projects" ADD CONSTRAINT "Projects_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "Profile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Address" ADD CONSTRAINT "Address_permanentUserId_fkey" FOREIGN KEY ("permanentUserId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
