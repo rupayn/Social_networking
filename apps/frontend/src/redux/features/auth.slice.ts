@@ -45,7 +45,7 @@ interface Profile {
 }
 
 export interface AuthStateInterFace {
-  isAuthenticated:boolean,
+  isAuthenticated: boolean;
   value: {
     id: string;
     email: string;

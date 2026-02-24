@@ -33,7 +33,7 @@ function SignupFifthComp({ dataFields, prevStep, updateDataFields }: Props) {
   const [website, setWebsite] = useState(dataFields.website || "");
 
   const theme = useSelector((state: RootState) => state.theme.value);
-  const [signup, { error,isLoading, isError }] = useSignUpMutation();
+  const [signup, { isLoading, isError }] = useSignUpMutation();
 
   const handelSignUp = async function () {
     updateDataFields({ github, linkedin, twitter, website });
@@ -112,7 +112,7 @@ function SignupFifthComp({ dataFields, prevStep, updateDataFields }: Props) {
           transition: Zoom,
         });
       } else {
-        toast.error(error?.message||"Something went wrong", {
+        toast.error(error instanceof Error ? error?.message : "Something went wrong", {
           theme: theme === "dark" ? "light" : "dark",
           position: "top-center",
           closeOnClick: true,

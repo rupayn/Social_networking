@@ -194,7 +194,7 @@ export const signUpController = asyncHandler(
         if (uploadData.resumePublicId) {
           await deleteFilesFromCloudinary([uploadData.resumePublicId]);
         }
-        if(avatar){
+        if (avatar) {
           await fs.unlink(avatar.path).catch(() => {});
         }
         if (resume) {

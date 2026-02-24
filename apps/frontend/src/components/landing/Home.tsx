@@ -1,6 +1,3 @@
-import type { RootState } from "../../redux/store";
-import React from "react";
-import { useSelector } from "react-redux";
 import { useGetUserQuery } from "../../redux/features/api/userApi.sclice";
 
 type ApiError = {
@@ -9,8 +6,6 @@ type ApiError = {
 };
 
 function Home() {
-  const theme = useSelector((state: RootState) => state.auth.value);
-
   const { data, error, isLoading, isError } = useGetUserQuery();
 
   if (isLoading) return <div>Loading...</div>;
